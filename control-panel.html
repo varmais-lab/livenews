@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsLive — Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E8131A;
+    --dark-red: #B50E14;
+    --yellow: #FFC300;
+    --dark: #0A0C10;
+    --dark2: #0F1318;
+    --panel: #161B22;
+    --panel2: #1C2330;
+    --border: #2A3040;
+    --white: #F0F4FF;
+    --gray: #8892A4;
+    --blue: #1A4FBB;
+    --green: #00D97E;
+    --orange: #FF8C00;
+    --input-bg: #111827;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    font-family: 'Barlow', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  /* ─── TOP ─── */
+  .cp-header {
+    background: var(--dark2);
+    border-bottom: 2px solid var(--red);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .cp-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .cp-logo span { color: var(--red); }
+  .cp-logo small {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gray);
+    margin-left: 10px;
+    font-weight: 600;
+  }
+
+  .cp-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--red); color: white; }
+  .btn-primary:hover { background: var(--dark-red); }
+  .btn-secondary { background: var(--panel2); color: var(--white); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--gray); }
+  .btn-success { background: var(--green); color: #000; }
+  .btn-success:hover { background: #00b868; }
+  .btn-warning { background: var(--orange); color: #000; }
+  .btn-blue { background: var(--blue); color: white; }
+  .btn-blue:hover { background: #1340a0; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-danger { background: #3A1010; color: var(--red); border: 1px solid var(--red); }
+  .btn-danger:hover { background: var(--red); color: white; }
+
+  /* ─── LAYOUT ─── */
+  .cp-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 0;
+    min-height: calc(100vh - 54px);
+  }
+
+  .cp-col {
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cp-col:last-child { border-right: none; }
+
+  /* ─── SECTION ─── */
+  .section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: var(--dark2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* ─── FORM ELEMENTS ─── */
+  label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"], input[type="url"], input[type="number"], textarea, select {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--red); }
+  select option { background: var(--input-bg); }
+  textarea { min-height: 60px; }
+
+  .field { display: flex; flex-direction: column; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* ─── TOGGLE ─── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+  }
+  .toggle-desc {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  .toggle {
+    position: relative;
+    width: 42px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--border);
+    border-radius: 22px;
+    transition: 0.3s;
+  }
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: var(--gray);
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--red); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(20px); background: white; }
+
+  /* ─── TICKER ITEMS ─── */
+  .ticker-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+  .ticker-list::-webkit-scrollbar { width: 4px; }
+  .ticker-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .ticker-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 10px;
+  }
+  .ticker-item-row span {
+    flex: 1;
+    font-size: 12px;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ticker-item-row .del-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .ticker-item-row .del-btn:hover { color: var(--red); }
+
+  /* ─── STORY CARDS ─── */
+  .story-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
+  .story-list::-webkit-scrollbar { width: 4px; }
+  .story-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .story-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .story-item:hover { border-color: var(--gray); }
+  .story-item.active { border-color: var(--red); border-left: 3px solid var(--red); }
+
+  .story-item-thumb {
+    width: 60px;
+    height: 45px;
+    border-radius: 3px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--border);
+  }
+  .story-item-info { flex: 1; min-width: 0; }
+  .story-item-cat {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+  }
+  .story-item-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .story-item-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  /* ─── STATUS BAR ─── */
+  .status-bar {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .status-dot.red { background: var(--red); animation: blink 1s infinite; }
+  .status-dot.gray { background: var(--gray); }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0} }
+  .status-text { color: var(--gray); }
+  .status-text strong { color: var(--white); }
+
+  /* ─── PREVIEW PANE ─── */
+  .preview-pane {
+    background: #000;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 16/9;
+    border: 1px solid var(--border);
+  }
+  .preview-pane img, .preview-pane video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .preview-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    padding: 20px 10px 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+  }
+  .preview-label {
+    position: absolute;
+    top: 6px; right: 6px;
+    background: var(--red);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+  .preview-empty {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--border); font-size: 32px;
+    flex-direction: column; gap: 8px;
+  }
+  .preview-empty span { font-size: 12px; letter-spacing: 2px; font-family: 'Barlow Condensed', sans-serif; }
+
+  /* ─── ALERT FLASH ─── */
+  .flash-indicator {
+    display: none;
+    background: rgba(232,19,26,0.1);
+    border: 1px solid var(--red);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-align: center;
+  }
+
+  /* Color accent options */
+  .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .color-chip {
+    width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
+    border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .color-chip.selected { border-color: white; }
+
+  .divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+  /* Save indicator */
+  #saveStatus {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--green);
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="cp-header">
+  <div>
+    <span class="cp-logo">NEWS<span>LIVE</span></span>
+    <span class="cp-logo"><small>CONTROL PANEL</small></span>
+  </div>
+  <div class="cp-actions">
+    <span id="saveStatus">✓ SAVED</span>
+    <button class="btn btn-secondary btn-sm" onclick="openViewer()">👁 OPEN VIEWER</button>
+    <button class="btn btn-warning btn-sm" onclick="triggerAlert()">⚡ FLASH ALERT</button>
+    <button class="btn btn-primary" onclick="pushToAir()">📡 PUSH TO AIR</button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="cp-layout">
+
+  <!-- ── COLUMN 1: MEDIA & LOWER THIRDS ── -->
+  <div class="cp-col">
+
+    <!-- Status -->
+    <div class="status-bar">
+      <div class="status-dot green" id="statusDot"></div>
+      <div class="status-text">Broadcast <strong id="statusText">READY</strong></div>
+      <div style="margin-left:auto;font-size:11px;color:var(--gray)" id="lastPush">Not yet pushed</div>
+    </div>
+
+    <!-- Media Control -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📹 MAIN FEED MEDIA</div>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Media Type</label>
+          <select id="mediaType" onchange="onMediaTypeChange()">
+            <option value="none">— No Media —</option>
+            <option value="video">Video (URL or local)</option>
+            <option value="image">Image (URL)</option>
+          </select>
+        </div>
+        <div class="field" id="mediaUrlField">
+          <label>Media URL</label>
+          <input type="url" id="mediaUrl" placeholder="https://... or file path" oninput="autoSave()">
+        </div>
+        <div class="field" id="mediaUploadField" style="display:none">
+          <label>Upload Video File</label>
+          <input type="file" accept="video/*" id="mediaFile" onchange="onFileUpload()" style="color:var(--gray);background:var(--input-bg);border:1px solid var(--border);border-radius:4px;padding:6px;width:100%">
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-pane" id="previewPane">
+          <div class="preview-empty" id="previewEmpty">
+            <span>📺</span>
+            <span>NO PREVIEW</span>
+          </div>
+          <img id="previewImg" style="display:none" src="" alt="">
+          <video id="previewVid" style="display:none" muted loop autoplay playsinline></video>
+          <div class="preview-label">PREVIEW</div>
+          <div class="preview-overlay" id="previewOverlayText"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breaking Banner -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🔴 BREAKING BANNER</div>
+        <label class="toggle">
+          <input type="checkbox" id="breakingVisible" onchange="autoSave()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Banner Label</label>
+            <select id="breakingLabel" onchange="autoSave()">
+              <option value="BREAKING\nNEWS">BREAKING NEWS</option>
+              <option value="EXCLUSIVE">EXCLUSIVE</option>
+              <option value="JUST\nIN">JUST IN</option>
+              <option value="DEVELOPING\nSTORY">DEVELOPING</option>
+              <option value="LIVE\nUPDATE">LIVE UPDATE</option>
+              <option value="SPECIAL\nREPORT">SPECIAL REPORT</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Source Tag</label>
+            <input type="text" id="sourceTag" value="SUMANTV" oninput="autoSave()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Headline Text</label>
+          <input type="text" id="headlineText" placeholder="Enter breaking headline..." oninput="autoSave(); updatePreview()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub Headline -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📌 SUB HEADLINE</div>
+        <label class="toggle">
+          <input type="checkbox" id="subHeadlineVisible" onchange="autoSave()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Label</label>
+            <select id="subLabel" onchange="autoSave()">
+              <option value="DEVELOPING">DEVELOPING</option>
+              <option value="CONTEXT">CONTEXT</option>
+              <option value="BACKGROUND">BACKGROUND</option>
+              <option value="WHAT WE KNOW">WHAT WE KNOW</option>
+              <option value="LATEST UPDATE">LATEST UPDATE</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sub Text</label>
+            <input type="text" id="subText" placeholder="Context / sub detail..." oninput="autoSave()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🏷 OVERLAY TAGS</div>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Story Tag (top-left)</label>
+            <input type="text" id="storyTagText" placeholder="e.g. FAST TRACK TO PROGRESS" oninput="autoSave()">
+          </div>
+          <div class="field">
+            <label>Show Story Tag</label>
+            <div style="margin-top:6px">
+              <label class="toggle">
+                <input type="checkbox" id="storyTagVisible" onchange="autoSave()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Location Tag</label>
+            <input type="text" id="locationTagText" placeholder="e.g. SAHARANPUR, U.P." oninput="autoSave()">
+          </div>
+          <div class="field">
+            <label>Show Location Tag</label>
+            <div style="margin-top:6px">
+              <label class="toggle">
+                <input type="checkbox" id="locationTagVisible" onchange="autoSave()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── COLUMN 2: STORIES & TICKER ── -->
+  <div class="cp-col">
+
+    <!-- Add Story -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📰 ADD STORY</div>
+        <button class="btn btn-primary btn-sm" onclick="addStory()">+ ADD</button>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Story Title</label>
+            <input type="text" id="newStoryTitle" placeholder="Short story title">
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select id="newStoryCategory">
+              <option>BREAKING NEWS</option>
+              <option>HEALTH</option>
+              <option>POLITICS</option>
+              <option>INTERNATIONAL</option>
+              <option>BUSINESS</option>
+              <option>SPORTS</option>
+              <option>ENTERTAINMENT</option>
+              <option>TECHNOLOGY</option>
+              <option>EXCLUSIVE</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Headline (for banner)</label>
+          <input type="text" id="newStoryHeadline" placeholder="Full headline for breaking banner">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Thumbnail URL</label>
+            <input type="url" id="newStoryImage" placeholder="https://...">
+          </div>
+          <div class="field">
+            <label>Media Type</label>
+            <select id="newStoryMediaType">
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Media URL (full screen)</label>
+          <input type="url" id="newStoryMediaUrl" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Sub Text / Context</label>
+          <input type="text" id="newStorySubText" placeholder="Additional context...">
+        </div>
+        <div class="field">
+          <label>Time Label</label>
+          <input type="text" id="newStoryTime" placeholder="e.g. 2 mins ago | Just now">
+        </div>
+      </div>
+    </div>
+
+    <!-- Story List -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📋 STORY QUEUE</div>
+        <button class="btn btn-secondary btn-sm" onclick="clearStories()">CLEAR ALL</button>
+      </div>
+      <div class="section-body" style="padding:10px">
+        <div class="story-list" id="storyList">
+          <div style="padding:16px;color:var(--gray);font-size:12px;text-align:center;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">NO STORIES YET</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticker -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📡 TICKER MESSAGES</div>
+        <button class="btn btn-primary btn-sm" onclick="addTickerItem()">+ ADD</button>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>New Ticker Item</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="newTickerItem" placeholder="Enter ticker text..." style="flex:1" onkeydown="if(event.key==='Enter')addTickerItem()">
+          </div>
+        </div>
+        <div class="ticker-list" id="tickerList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── COLUMN 3: BRANDING & SETTINGS ── -->
+  <div class="cp-col">
+
+    <!-- Channel Branding -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🎨 CHANNEL BRANDING</div>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Channel Name</label>
+          <input type="text" id="channelName" value="SUMANTV" oninput="autoSave()" placeholder="e.g. SUMANTV">
+        </div>
+        <div class="field">
+          <label>Channel Sub-tag / Badge</label>
+          <input type="text" id="channelTagline" value="HEALTH" oninput="autoSave()" placeholder="e.g. HEALTH, NEWS, LIVE">
+        </div>
+        <div class="divider"></div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Brand Watermark</div>
+            <div class="toggle-desc">Show brand name on video</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="brandVisible" checked onchange="autoSave()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="field">
+          <label>Brand Watermark Text</label>
+          <input type="text" id="brandName" value="SumanTV Health" oninput="autoSave()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Weather Widget -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🌤 WEATHER WIDGET</div>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field">
+            <label>City</label>
+            <input type="text" id="weatherCity" value="HYDERABAD" oninput="autoSave()">
+          </div>
+          <div class="field">
+            <label>Temperature</label>
+            <input type="text" id="weatherTemp" value="34°" oninput="autoSave()">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Description</label>
+            <input type="text" id="weatherDesc" value="Partly Cloudy" oninput="autoSave()">
+          </div>
+          <div class="field">
+            <label>Icon (emoji)</label>
+            <input type="text" id="weatherIcon" value="⛅" oninput="autoSave()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display Options -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">⚙ DISPLAY OPTIONS</div>
+      </div>
+      <div class="section-body">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Fullscreen Mode</div>
+            <div class="toggle-desc">Hide sidebar in viewer</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="fullscreen" onchange="autoSave()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Presets -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">⚡ QUICK PRESETS</div>
+      </div>
+      <div class="section-body">
+        <button class="btn btn-secondary" style="width:100%;margin-bottom:6px" onclick="applyPreset('breaking')">🔴 Breaking News Layout</button>
+        <button class="btn btn-secondary" style="width:100%;margin-bottom:6px" onclick="applyPreset('health')">💚 Health Report Layout</button>
+        <button class="btn btn-secondary" style="width:100%;margin-bottom:6px" onclick="applyPreset('interview')">🎙 Interview Layout</button>
+        <button class="btn btn-secondary" style="width:100%" onclick="applyPreset('clean')">✨ Clean / Minimal</button>
+      </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🚨 FLASH ALERT</div>
+      </div>
+      <div class="section-body">
+        <div class="flash-indicator" id="flashIndicator">ALERT TRIGGERED</div>
+        <p style="font-size:12px;color:var(--gray);margin-bottom:8px">Trigger a red flash border on the viewer screen for urgent stories.</p>
+        <button class="btn btn-danger" style="width:100%" onclick="triggerAlert()">⚡ TRIGGER ALERT FLASH</button>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">💾 STATE EXPORT</div>
+      </div>
+      <div class="section-body">
+        <button class="btn btn-secondary" style="width:100%;margin-bottom:6px" onclick="exportState()">📥 Export JSON</button>
+        <button class="btn btn-secondary" style="width:100%" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importState(event)">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─── STATE ───
+let state = {
+  channelName: 'SUMANTV',
+  channelTagline: 'HEALTH',
+  brandVisible: true,
+  brandName: 'SumanTV Health',
+  mediaType: 'none',
+  mediaUrl: '',
+  breakingVisible: false,
+  breakingLabel: 'BREAKING\nNEWS',
+  headlineText: '',
+  sourceTag: 'SUMANTV',
+  subHeadlineVisible: false,
+  subLabel: 'DEVELOPING',
+  subText: '',
+  storyTagVisible: false,
+  storyTagText: '',
+  locationTagVisible: false,
+  locationTagText: '',
+  tickerItems: [
+    'SumanTV Health — Over 100 hospital partners across Andhra Pradesh and Telangana',
+    'Watch exclusive doctor interviews every day at 9 AM and 6 PM IST',
+    'SumanTV Health: Your trusted source for wellness content in Telugu',
+  ],
+  stories: [],
+  weather: { city: 'HYDERABAD', temp: '34°', desc: 'Partly Cloudy', icon: '⛅' },
+  fullscreen: false,
+};
+
+// ─── INIT ───
+function init() {
+  try {
+    const saved = localStorage.getItem('newsbroadcast_state');
+    if (saved) state = { ...state, ...JSON.parse(saved) };
+  } catch(e) {}
+  populateForm();
+  renderTickerList();
+  renderStoryList();
+}
+
+function populateForm() {
+  sv('channelName', state.channelName);
+  sv('channelTagline', state.channelTagline);
+  sb('brandVisible', state.brandVisible);
+  sv('brandName', state.brandName);
+  sv('mediaType', state.mediaType);
+  sv('mediaUrl', state.mediaUrl);
+  sb('breakingVisible', state.breakingVisible);
+  sv('breakingLabel', state.breakingLabel);
+  sv('headlineText', state.headlineText);
+  sv('sourceTag', state.sourceTag);
+  sb('subHeadlineVisible', state.subHeadlineVisible);
+  sv('subLabel', state.subLabel);
+  sv('subText', state.subText);
+  sb('storyTagVisible', state.storyTagVisible);
+  sv('storyTagText', state.storyTagText);
+  sb('locationTagVisible', state.locationTagVisible);
+  sv('locationTagText', state.locationTagText);
+  sv('weatherCity', state.weather.city);
+  sv('weatherTemp', state.weather.temp);
+  sv('weatherDesc', state.weather.desc);
+  sv('weatherIcon', state.weather.icon);
+  sb('fullscreen', state.fullscreen);
+  onMediaTypeChange();
+}
+
+function sv(id, val) { const el = document.getElementById(id); if(el) el.value = val || ''; }
+function sb(id, val) { const el = document.getElementById(id); if(el) el.checked = !!val; }
+function gv(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+
+// ─── COLLECT STATE FROM FORM ───
+function collectState() {
+  state.channelName = gv('channelName');
+  state.channelTagline = gv('channelTagline');
+  state.brandVisible = gb('brandVisible');
+  state.brandName = gv('brandName');
+  state.mediaType = gv('mediaType');
+  state.mediaUrl = gv('mediaUrl');
+  state.breakingVisible = gb('breakingVisible');
+  state.breakingLabel = gv('breakingLabel');
+  state.headlineText = gv('headlineText');
+  state.sourceTag = gv('sourceTag');
+  state.subHeadlineVisible = gb('subHeadlineVisible');
+  state.subLabel = gv('subLabel');
+  state.subText = gv('subText');
+  state.storyTagVisible = gb('storyTagVisible');
+  state.storyTagText = gv('storyTagText');
+  state.locationTagVisible = gb('locationTagVisible');
+  state.locationTagText = gv('locationTagText');
+  state.weather = {
+    city: gv('weatherCity'),
+    temp: gv('weatherTemp'),
+    desc: gv('weatherDesc'),
+    icon: gv('weatherIcon'),
+  };
+  state.fullscreen = gb('fullscreen');
+  return state;
+}
+
+// ─── AUTOSAVE ───
+let saveTimer;
+function autoSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    collectState();
+    localStorage.setItem('newsbroadcast_state', JSON.stringify(state));
+    const el = document.getElementById('saveStatus');
+    el.style.display = 'inline';
+    setTimeout(() => el.style.display = 'none', 1500);
+    updatePreview();
+  }, 300);
+}
+
+function pushToAir() {
+  collectState();
+  localStorage.setItem('newsbroadcast_state', JSON.stringify(state));
+  const el = document.getElementById('saveStatus');
+  el.style.display = 'inline';
+  el.textContent = '✓ ON AIR';
+  setTimeout(() => { el.style.display = 'none'; el.textContent = '✓ SAVED'; }, 2000);
+  document.getElementById('lastPush').textContent = 'Pushed: ' + new Date().toLocaleTimeString('en-IN');
+  document.getElementById('statusText').textContent = 'ON AIR';
+}
+
+// ─── MEDIA TYPE CHANGE ───
+function onMediaTypeChange() {
+  const t = gv('mediaType');
+  document.getElementById('mediaUrlField').style.display = t === 'none' ? 'none' : 'block';
+  document.getElementById('mediaUploadField').style.display = t === 'video' ? 'block' : 'none';
+  updatePreview();
+  autoSave();
+}
+
+function onFileUpload() {
+  const file = document.getElementById('mediaFile').files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  document.getElementById('mediaUrl').value = url;
+  state.mediaUrl = url;
+  state.mediaType = 'video';
+  updatePreview();
+  autoSave();
+}
+
+// ─── PREVIEW ───
+function updatePreview() {
+  const t = gv('mediaType');
+  const url = gv('mediaUrl');
+  const img = document.getElementById('previewImg');
+  const vid = document.getElementById('previewVid');
+  const empty = document.getElementById('previewEmpty');
+  const overlay = document.getElementById('previewOverlayText');
+
+  if (t === 'image' && url) {
+    img.src = url; img.style.display = 'block';
+    vid.style.display = 'none'; empty.style.display = 'none';
+  } else if (t === 'video' && url) {
+    vid.src = url; vid.style.display = 'block'; vid.load();
+    img.style.display = 'none'; empty.style.display = 'none';
+  } else {
+    empty.style.display = 'flex';
+    img.style.display = 'none'; vid.style.display = 'none';
+  }
+
+  overlay.textContent = gv('headlineText') || '';
+}
+
+// ─── TICKER ───
+function renderTickerList() {
+  const list = document.getElementById('tickerList');
+  if (!state.tickerItems.length) {
+    list.innerHTML = '<div style="color:var(--gray);font-size:12px;padding:8px;text-align:center">No ticker items</div>';
+    return;
+  }
+  list.innerHTML = state.tickerItems.map((t, i) => `
+    <div class="ticker-item-row">
+      <span>${t}</span>
+      <button class="del-btn" onclick="removeTickerItem(${i})" title="Remove">✕</button>
+    </div>
+  `).join('');
+}
+
+function addTickerItem() {
+  const input = document.getElementById('newTickerItem');
+  const text = input.value.trim();
+  if (!text) return;
+  state.tickerItems.push(text);
+  input.value = '';
+  renderTickerList();
+  autoSave();
+}
+
+function removeTickerItem(i) {
+  state.tickerItems.splice(i, 1);
+  renderTickerList();
+  autoSave();
+}
+
+// ─── STORIES ───
+function renderStoryList() {
+  const list = document.getElementById('storyList');
+  if (!state.stories.length) {
+    list.innerHTML = '<div style="color:var(--gray);font-size:12px;padding:12px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:1px">NO STORIES IN QUEUE</div>';
+    return;
+  }
+  list.innerHTML = state.stories.map((s, i) => `
+    <div class="story-item ${s.active ? 'active' : ''}">
+      ${s.image ? `<img class="story-item-thumb" src="${s.image}" onerror="this.style.background='var(--border)'" alt="">` : `<div class="story-item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">📰</div>`}
+      <div class="story-item-info">
+        <div class="story-item-cat">${s.category || 'NEWS'}</div>
+        <div class="story-item-title">${s.title || 'Untitled'}</div>
+        <div class="story-item-actions">
+          <button class="btn btn-primary btn-sm" onclick="activateStory(${i})">▶ ON AIR</button>
+          <button class="btn btn-secondary btn-sm" onclick="removeStory(${i})">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addStory() {
+  const title = gv('newStoryTitle').trim();
+  if (!title) { alert('Please enter a story title.'); return; }
+  const story = {
+    title,
+    category: gv('newStoryCategory'),
+    headline: gv('newStoryHeadline'),
+    image: gv('newStoryImage'),
+    mediaType: gv('newStoryMediaType'),
+    mediaUrl: gv('newStoryMediaUrl'),
+    subText: gv('newStorySubText'),
+    time: gv('newStoryTime') || 'Just now',
+    active: false,
+  };
+  state.stories.push(story);
+  // Clear form
+  ['newStoryTitle','newStoryHeadline','newStoryImage','newStoryMediaUrl','newStorySubText','newStoryTime'].forEach(id => document.getElementById(id).value = '');
+  renderStoryList();
+  autoSave();
+}
+
+function activateStory(index) {
+  state.stories = state.stories.map((s, i) => ({...s, active: i === index}));
+  const story = state.stories[index];
+  if (story.headline) { state.headlineText = story.headline; state.breakingVisible = true; sv('headlineText', story.headline); sb('breakingVisible', true); }
+  if (story.mediaUrl) { state.mediaUrl = story.mediaUrl; state.mediaType = story.mediaType || 'image'; sv('mediaUrl', story.mediaUrl); sv('mediaType', story.mediaType||'image'); }
+  if (story.subText) { state.subText = story.subText; state.subHeadlineVisible = true; sv('subText', story.subText); sb('subHeadlineVisible', true); }
+  renderStoryList();
+  updatePreview();
+  pushToAir();
+}
+
+function removeStory(i) {
+  state.stories.splice(i, 1);
+  renderStoryList();
+  autoSave();
+}
+
+function clearStories() {
+  if (!confirm('Clear all stories?')) return;
+  state.stories = [];
+  renderStoryList();
+  autoSave();
+}
+
+// ─── ALERT FLASH ───
+function triggerAlert() {
+  localStorage.setItem('newsbroadcast_alert', Date.now().toString());
+  const fi = document.getElementById('flashIndicator');
+  fi.style.display = 'block';
+  setTimeout(() => fi.style.display = 'none', 2000);
+}
+
+// ─── PRESETS ───
+function applyPreset(type) {
+  if (type === 'breaking') {
+    sb('breakingVisible', true); sv('breakingLabel', 'BREAKING\nNEWS');
+    sb('subHeadlineVisible', true); sv('subLabel', 'DEVELOPING');
+    sb('storyTagVisible', false); sb('locationTagVisible', false);
+  } else if (type === 'health') {
+    sb('breakingVisible', true); sv('breakingLabel', 'SPECIAL\nREPORT');
+    sv('channelTagline', 'HEALTH'); sv('sourceTag', 'SUMANTV HEALTH');
+    sb('brandVisible', true);
+  } else if (type === 'interview') {
+    sb('breakingVisible', true); sv('breakingLabel', 'EXCLUSIVE');
+    sb('subHeadlineVisible', true); sv('subLabel', 'INTERVIEW');
+    sb('storyTagVisible', false);
+  } else if (type === 'clean') {
+    sb('breakingVisible', false); sb('subHeadlineVisible', false);
+    sb('storyTagVisible', false); sb('locationTagVisible', false);
+  }
+  autoSave();
+}
+
+// ─── EXPORT / IMPORT ───
+function exportState() {
+  collectState();
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'newsbroadcast_state.json';
+  a.click();
+}
+
+function importState(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      state = { ...state, ...imported };
+      localStorage.setItem('newsbroadcast_state', JSON.stringify(state));
+      populateForm();
+      renderTickerList();
+      renderStoryList();
+      alert('State imported successfully!');
+    } catch(err) { alert('Invalid JSON file.'); }
+  };
+  reader.readAsText(file);
+}
+
+function openViewer() {
+  window.open('viewer.html', '_blank');
+}
+
+init();
+</script>
+</body>
+</html>
