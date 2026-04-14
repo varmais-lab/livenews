@@ -682,7 +682,18 @@
       </div>
       <div class="section-body">
         <div class="field">
-          <label>Channel Name</label>
+          <label>Channel Logo (PNG Image)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" id="logoFile" onchange="onLogoUpload()" style="color:var(--gray);background:var(--input-bg);border:1px solid var(--border);border-radius:4px;padding:6px;flex:1;font-size:12px">
+            <button class="btn btn-danger btn-sm" onclick="clearLogo()" title="Remove logo">✕</button>
+          </div>
+          <div id="logoPreviewWrap" style="display:none;margin-top:8px;background:#000;border-radius:4px;padding:8px;text-align:center">
+            <img id="logoPreview" src="" style="max-height:50px;max-width:160px;object-fit:contain">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="field">
+          <label>Channel Name (fallback if no logo)</label>
           <input type="text" id="channelName" value="SUMANTV" oninput="autoSave()" placeholder="e.g. SUMANTV">
         </div>
         <div class="field">
@@ -800,6 +811,7 @@
 let state = {
   channelName: 'SUMANTV',
   channelTagline: 'HEALTH',
+  logoUrl: '',
   brandVisible: true,
   brandName: 'SumanTV Health',
   mediaType: 'none',
@@ -839,6 +851,11 @@ function init() {
 function populateForm() {
   sv('channelName', state.channelName);
   sv('channelTagline', state.channelTagline);
+  // Show logo preview if exists
+  if (state.logoUrl) {
+    document.getElementById('logoPreview').src = state.logoUrl;
+    document.getElementById('logoPreviewWrap').style.display = 'block';
+  }
   sb('brandVisible', state.brandVisible);
   sv('brandName', state.brandName);
   sv('mediaType', state.mediaType);
@@ -871,6 +888,7 @@ function gb(id) { const el = document.getElementById(id); return el ? el.checked
 function collectState() {
   state.channelName = gv('channelName');
   state.channelTagline = gv('channelTagline');
+  // logoUrl is set separately via file upload, don't overwrite it here
   state.brandVisible = gb('brandVisible');
   state.brandName = gv('brandName');
   state.mediaType = gv('mediaType');
@@ -1152,6 +1170,32 @@ function importState(event) {
 
 function openViewer() {
   window.open('viewer.html', '_blank');
+}
+
+// ─── LOGO UPLOAD ───
+function onLogoUpload() {
+  const file = document.getElementById('logoFile').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.logoUrl = e.target.result;
+    document.getElementById('logoPreview').src = e.target.result;
+    document.getElementById('logoPreviewWrap').style.display = 'block';
+    localStorage.setItem('newsbroadcast_state', JSON.stringify(state));
+    const el = document.getElementById('saveStatus');
+    el.style.display = 'inline'; el.textContent = '✓ LOGO SAVED';
+    setTimeout(() => { el.style.display = 'none'; el.textContent = '✓ SAVED'; }, 2000);
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearLogo() {
+  state.logoUrl = '';
+  document.getElementById('logoPreviewWrap').style.display = 'none';
+  document.getElementById('logoPreview').src = '';
+  document.getElementById('logoFile').value = '';
+  localStorage.setItem('newsbroadcast_state', JSON.stringify(state));
+  autoSave();
 }
 
 init();
