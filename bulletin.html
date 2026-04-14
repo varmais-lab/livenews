@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SumanTV — Breaking News Bulletin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E8131A;
+  --dark-red: #B50E14;
+  --yellow: #FFC300;
+  --dark: #0A0C10;
+  --dark2: #0F1318;
+  --panel: #161B22;
+  --panel2: #1C2330;
+  --border: #2A3040;
+  --white: #F0F4FF;
+  --gray: #8892A4;
+  --blue: #1A4FBB;
+  --green: #00D97E;
+  --ticker-bg: #1A1E2A;
+  --input-bg: #111827;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--dark); font-family: 'Barlow', sans-serif; color: var(--white); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--dark2);
+  border-bottom: 2px solid var(--red);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 50px;
+}
+.header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--white); }
+.header-logo span { color: var(--red); }
+.header-logo small { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 3px; color: var(--gray); margin-left: 10px; }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+
+/* ── MAIN LAYOUT ── */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── LEFT: BUILDER ── */
+.builder {
+  width: 480px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.builder-scroll { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.builder-scroll::-webkit-scrollbar { width: 4px; }
+.builder-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── RIGHT: VIEWER ── */
+.viewer-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050608;
+  padding: 20px;
+  position: relative;
+}
+
+/* ── SECTION CARD ── */
+.section { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.section-head { background: var(--dark2); border-bottom: 1px solid var(--border); padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; }
+.section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); }
+.section-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ── SLIDE TABS ── */
+.slide-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--dark2); flex-shrink: 0; }
+.slide-tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 10px 16px;
+  cursor: pointer;
+  color: var(--gray);
+  border-right: 1px solid var(--border);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.slide-tab:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+.slide-tab.active { color: var(--white); border-bottom-color: var(--red); background: var(--panel); }
+.slide-tab.has-content::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.slide-tab.add-tab { color: var(--gray); font-size: 18px; padding: 8px 14px; }
+.slide-tab.add-tab:hover { color: var(--red); }
+.del-slide-btn { font-size: 12px; color: var(--gray); margin-left: 2px; cursor: pointer; opacity: 0; transition: opacity 0.15s; }
+.slide-tab:hover .del-slide-btn { opacity: 1; }
+.del-slide-btn:hover { color: var(--red); }
+
+/* ── FORM ELEMENTS ── */
+label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 4px; }
+input[type="text"], input[type="url"], input[type="number"], select, textarea {
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--white); font-family: 'Barlow', sans-serif; font-size: 13px;
+  padding: 7px 10px; outline: none; transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--red); }
+select option { background: var(--input-bg); }
+textarea { resize: vertical; min-height: 48px; line-height: 1.5; }
+.field { display: flex; flex-direction: column; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── BULLET ROWS ── */
+.bullet-row { display: flex; align-items: center; gap: 8px; }
+.bullet-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--red); color: white;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.bullet-row input { flex: 1; }
+
+/* ── MEDIA UPLOAD ── */
+.media-area { display: flex; gap: 10px; align-items: stretch; }
+.media-thumb-preview {
+  width: 90px; height: 62px; border-radius: 4px; overflow: hidden;
+  background: var(--input-bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: relative;
+}
+.media-thumb-preview img { width: 100%; height: 100%; object-fit: cover; }
+.media-thumb-preview .no-img { font-size: 22px; opacity: 0.25; }
+.media-upload-zone {
+  flex: 1; border: 1.5px dashed var(--border); border-radius: 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer; transition: border-color 0.2s; padding: 8px;
+  position: relative;
+}
+.media-upload-zone:hover { border-color: var(--red); }
+.media-upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 18px; }
+.upload-text { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--gray); }
+
+/* ── BTNS ── */
+.btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 16px; border: none; border-radius: 3px; cursor: pointer; transition: all 0.15s; }
+.btn-primary { background: var(--red); color: white; }
+.btn-primary:hover { background: var(--dark-red); }
+.btn-secondary { background: var(--panel2); color: var(--white); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--gray); }
+.btn-success { background: var(--green); color: #000; }
+.btn-success:hover { background: #00b868; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-danger { background: #3A1010; color: var(--red); border: 1px solid var(--red); }
+
+/* ── SLIDE QUEUE (bottom of builder) ── */
+.queue-bar {
+  border-top: 1px solid var(--border);
+  background: var(--dark2);
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+.queue-list { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; }
+.queue-list::-webkit-scrollbar { width: 4px; }
+.queue-list::-webkit-scrollbar-thumb { background: var(--border); }
+.q-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--panel); border: 1px solid var(--border); border-radius: 4px; }
+.q-item.playing { border-color: var(--red); border-left: 3px solid var(--red); }
+.q-num { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--gray); flex-shrink: 0; }
+.q-num.live { background: var(--red); border-color: var(--red); color: white; }
+.q-thumb { width: 42px; height: 30px; border-radius: 3px; background: var(--border); flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--gray); }
+.q-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.q-info { flex: 1; min-width: 0; }
+.q-title { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.q-meta { font-size: 10px; color: var(--gray); margin-top: 2px; }
+.q-type { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 2px; margin-right: 4px; }
+.q-type.img { background: rgba(0,217,126,0.15); color: var(--green); }
+.q-type.vid { background: rgba(26,79,187,0.2); color: #6b9fff; }
+
+/* ── GO LIVE BAR ── */
+.golive-bar {
+  border-top: 2px solid var(--red);
+  background: var(--dark2);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.golive-timer { display: flex; align-items: center; gap: 8px; }
+.timer-ring {
+  width: 40px; height: 40px; position: relative; flex-shrink: 0;
+}
+.timer-ring svg { transform: rotate(-90deg); }
+.timer-ring .track { fill: none; stroke: var(--border); stroke-width: 3; }
+.timer-ring .fill { fill: none; stroke: var(--red); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 0.5s linear; }
+.timer-ring .label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--white); }
+.golive-info { flex: 1; }
+.golive-slide-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--gray); letter-spacing: 1px; }
+.golive-slide-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--white); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+.progress-bar-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--red); border-radius: 2px; transition: width 0.5s linear; width: 0%; }
+
+/* ════════════════════════
+   VIEWER SCREEN
+════════════════════════ */
+.viewer-screen {
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 60px rgba(0,0,0,0.8);
+}
+
+/* Topbar overlaid */
+.v-topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  z-index: 20;
+  pointer-events: none;
+}
+.v-logo { display: flex; align-items: center; gap: 8px; }
+.v-logo-img { height: 40px; width: auto; max-width: 160px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.8)); display: none; }
+.v-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--white); text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+.v-logo-text span { color: var(--red); }
+.v-logo-badge { background: var(--red); color: white; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; padding: 2px 5px; border-radius: 2px; }
+.v-right { display: flex; align-items: center; gap: 8px; }
+.v-live-pill { background: var(--red); color: white; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 2px; padding: 3px 8px; border-radius: 2px; box-shadow: 0 0 10px rgba(232,19,26,0.4); }
+.v-clock { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); text-shadow: 0 1px 4px rgba(0,0,0,0.8); letter-spacing: 1px; }
+
+/* Media area */
+.v-media { flex: 1; position: relative; overflow: hidden; background: #000; }
+.v-media video, .v-media iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
+.v-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.v-media-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; background: linear-gradient(135deg, #0d1020 0%, #1a1a2e 100%); color: rgba(255,255,255,0.15); font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; }
+.v-slide-counter { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.65); color: rgba(255,255,255,0.7); font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 3px 8px; border-radius: 2px; z-index: 5; backdrop-filter: blur(4px); }
+
+/* Timer strip at bottom of media */
+.v-timer-strip { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--red); z-index: 5; transition: width 0.5s linear; width: 0%; }
+
+/* Lower third */
+.v-lower { background: rgba(10,12,16,0.97); flex-shrink: 0; }
+
+/* Breaking banner */
+.v-breaking { display: flex; align-items: stretch; border-top: 3px solid var(--red); min-height: 46px; }
+.v-brk-label {
+  background: var(--red);
+  color: white;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  padding: 0 14px;
+  display: flex; align-items: center; flex-shrink: 0;
+  min-width: 120px; justify-content: center;
+  position: relative; text-align: center; line-height: 1.2;
+}
+.v-brk-label::after {
+  content: '';
+  position: absolute;
+  right: -12px; top: 0; bottom: 0;
+  border-left: 12px solid var(--red);
+  border-top: 46px solid transparent;
+}
+.v-headline {
+  flex: 1;
+  padding: 0 20px 0 22px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.3px;
+  color: var(--white);
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.v-source {
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  color: var(--gray);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 0 12px;
+  display: flex; align-items: center;
+  flex-shrink: 0;
+}
+
+/* Bullets */
+.v-bullets { padding: 8px 14px 10px 14px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; flex-direction: column; gap: 5px; }
+.v-bullet { display: flex; align-items: flex-start; gap: 8px; }
+.v-bullet-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); margin-top: 5px; flex-shrink: 0; }
+.v-bullet-text { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; color: rgba(240,244,255,0.85); line-height: 1.35; letter-spacing: 0.2px; }
+
+/* Ticker */
+.v-ticker { height: 28px; background: var(--ticker-bg); border-top: 2px solid var(--blue); display: flex; align-items: center; overflow: hidden; flex-shrink: 0; }
+.v-ticker-label { background: var(--blue); color: white; font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 2px; padding: 0 12px; height: 100%; display: flex; align-items: center; flex-shrink: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); padding-right: 18px; }
+.v-ticker-content { flex: 1; overflow: hidden; position: relative; }
+.v-ticker-track { display: flex; align-items: center; height: 100%; white-space: nowrap; animation: ticker-scroll 35s linear infinite; }
+.v-ticker-item { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 500; color: rgba(240,244,255,0.85); padding: 0 8px; }
+.v-ticker-sep { color: var(--red); font-size: 14px; opacity: 0.5; padding: 0 6px; }
+@keyframes ticker-scroll { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+
+/* Mute btn */
+.v-mute-btn {
+  position: absolute;
+  bottom: 78px;
+  right: 10px;
+  z-index: 30;
+  background: rgba(10,12,16,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  font-size: 16px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+  backdrop-filter: blur(4px);
+}
+.v-mute-btn:hover { background: rgba(232,19,26,0.6); }
+.v-mute-btn.unmuted { background: rgba(232,19,26,0.85); border-color: var(--red); }
+
+/* Idle overlay */
+.v-idle { position: absolute; inset: 0; background: linear-gradient(135deg,#0a0c10 0%,#141828 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: rgba(255,255,255,0.12); font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 5px; z-index: 2; }
+.v-idle .idle-icon { font-size: 48px; opacity: 0.15; }
+
+/* Transition flash */
+.v-flash { position: absolute; inset: 0; background: #000; opacity: 0; z-index: 10; pointer-events: none; transition: opacity 0.2s; }
+.v-flash.active { opacity: 1; }
+
+/* ── STATUS ── */
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.red { background: var(--red); }
+.status-dot.gray { background: var(--gray); }
+
+/* ── SAVE INDICATOR ── */
+#saveStatus { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--green); display: none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <span class="header-logo">NEWS<span>LIVE</span></span>
+    <span class="header-logo"><small>BULLETIN BUILDER</small></span>
+  </div>
+  <div class="header-actions">
+    <span id="saveStatus">✓ SAVED</span>
+    <div style="display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;">
+      <div class="status-dot gray" id="statusDot"></div>
+      <span id="statusText" style="color:var(--gray)">STANDBY</span>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="stopBulletin()">■ STOP</button>
+    <button class="btn btn-primary" id="goLiveBtn" onclick="startBulletin()">▶ GO LIVE</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ════ BUILDER PANEL ════ -->
+  <div class="builder">
+
+    <!-- Slide tabs -->
+    <div class="slide-tabs" id="slideTabs"></div>
+
+    <!-- Slide editor -->
+    <div class="builder-scroll" id="slideEditor">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Queue -->
+    <div class="queue-bar">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--red);margin-bottom:8px;">BROADCAST QUEUE</div>
+      <div class="queue-list" id="queueList"></div>
+    </div>
+
+    <!-- Go Live bar -->
+    <div class="golive-bar">
+      <div class="timer-ring" id="timerRing">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <circle class="track" cx="20" cy="20" r="15"/>
+          <circle class="fill" id="timerArc" cx="20" cy="20" r="15"/>
+        </svg>
+        <div class="timer-ring label" id="timerLabel">—</div>
+      </div>
+      <div class="golive-info">
+        <div class="golive-slide-label" id="liveSlideLabel">NOT PLAYING</div>
+        <div class="golive-slide-title" id="liveSlideTitles">—</div>
+      </div>
+      <div style="flex:1">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ VIEWER PANEL ════ -->
+  <div class="viewer-wrap">
+    <div class="viewer-screen">
+
+      <!-- Topbar -->
+      <div class="v-topbar">
+        <div class="v-logo">
+          <img class="v-logo-img" id="vLogoImg" src="" alt="">
+          <div id="vLogoText" style="display:flex;align-items:center;gap:8px">
+            <div class="v-logo-text">SUMAN<span>TV</span></div>
+            <div class="v-logo-badge">HEALTH</div>
+          </div>
+        </div>
+        <div class="v-right">
+          <div class="v-live-pill">LIVE</div>
+          <div class="v-clock" id="vClock">--:--:--</div>
+        </div>
+      </div>
+
+      <!-- Media -->
+      <div class="v-media" id="vMedia">
+        <div class="v-idle" id="vIdle">
+          <div class="idle-icon">📺</div>
+          <div>AWAITING BULLETIN</div>
+        </div>
+        <div class="v-flash" id="vFlash"></div>
+        <div class="v-slide-counter" id="vSlideCounter" style="display:none"></div>
+        <div class="v-timer-strip" id="vTimerStrip"></div>
+        <button class="v-mute-btn" id="vMuteBtn" onclick="toggleMute()">🔇</button>
+      </div>
+
+      <!-- Lower third -->
+      <div class="v-lower" id="vLower" style="display:none">
+        <div class="v-breaking">
+          <div class="v-brk-label" id="vBrkLabel">BREAKING<br>NEWS</div>
+          <div class="v-headline" id="vHeadline"></div>
+          <div class="v-source" id="vSource">SUMANTV</div>
+        </div>
+        <div class="v-bullets" id="vBullets"></div>
+      </div>
+
+      <!-- Ticker -->
+      <div class="v-ticker">
+        <div class="v-ticker-label">LATEST</div>
+        <div class="v-ticker-content">
+          <div class="v-ticker-track" id="vTickerTrack"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════
+//  STATE
+// ════════════════════════════════════
+const MAX_SLIDES = 4;
+
+let state = {
+  activeSlide: 0,
+  slides: [
+    { headline:'', bullets:['','','',''], mediaType:'none', mediaUrl:'', mediaDataUrl:'', bannerLabel:'BREAKING\nNEWS', duration:10, source:'SUMANTV' }
+  ],
+  logoUrl: '',
+  tickerItems: [
+    'SumanTV Health — Over 100 hospital partners across Andhra Pradesh and Telangana',
+    'Watch exclusive doctor interviews every day at 9 AM and 6 PM IST',
+    'SumanTV Health: Your trusted source for wellness content in Telugu',
+  ],
+  isPlaying: false,
+  currentSlide: 0,
+};
+
+// Load from localStorage
+try {
+  const saved = localStorage.getItem('bulletin_state');
+  if (saved) {
+    const p = JSON.parse(saved);
+    state = { ...state, ...p };
+    // Ensure slides have all fields
+    state.slides = state.slides.map(s => ({
+      headline:'', bullets:['','','',''], mediaType:'none', mediaUrl:'', mediaDataUrl:'',
+      bannerLabel:'BREAKING\nNEWS', duration:10, source:'SUMANTV', ...s
+    }));
+  }
+} catch(e) {}
+
+// ════════════════════════════════════
+//  CLOCK
+// ════════════════════════════════════
+function updateClock() {
+  document.getElementById('vClock').textContent =
+    new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ════════════════════════════════════
+//  SAVE
+// ════════════════════════════════════
+function save() {
+  localStorage.setItem('bulletin_state', JSON.stringify(state));
+  const el = document.getElementById('saveStatus');
+  el.style.display = 'inline';
+  clearTimeout(window._saveT);
+  window._saveT = setTimeout(() => el.style.display = 'none', 1200);
+}
+
+// ════════════════════════════════════
+//  RENDER TABS
+// ════════════════════════════════════
+function renderTabs() {
+  const tabs = document.getElementById('slideTabs');
+  tabs.innerHTML = '';
+  state.slides.forEach((s, i) => {
+    const hasContent = s.headline.trim() || s.bullets.some(b => b.trim()) || s.mediaDataUrl || s.mediaUrl;
+    const tab = document.createElement('div');
+    tab.className = 'slide-tab' + (i === state.activeSlide ? ' active' : '') + (hasContent ? ' has-content' : '');
+    tab.innerHTML = `Slide ${i+1}${state.slides.length > 1 ? `<span class="del-slide-btn" data-idx="${i}" title="Delete slide">✕</span>` : ''}`;
+    tab.addEventListener('click', (e) => {
+      if (e.target.classList.contains('del-slide-btn')) {
+        deleteSlide(parseInt(e.target.dataset.idx));
+      } else {
+        state.activeSlide = i;
+        renderTabs();
+        renderEditor();
+      }
+    });
+    tabs.appendChild(tab);
+  });
+  if (state.slides.length < MAX_SLIDES) {
+    const add = document.createElement('div');
+    add.className = 'slide-tab add-tab';
+    add.title = 'Add slide';
+    add.innerHTML = '＋';
+    add.onclick = addSlide;
+    tabs.appendChild(add);
+  }
+}
+
+function addSlide() {
+  if (state.slides.length >= MAX_SLIDES) return;
+  state.slides.push({ headline:'', bullets:['','','',''], mediaType:'none', mediaUrl:'', mediaDataUrl:'', bannerLabel:'BREAKING\nNEWS', duration:10, source:'SUMANTV' });
+  state.activeSlide = state.slides.length - 1;
+  renderTabs();
+  renderEditor();
+  save();
+}
+
+function deleteSlide(idx) {
+  if (state.slides.length <= 1) return;
+  state.slides.splice(idx, 1);
+  if (state.activeSlide >= state.slides.length) state.activeSlide = state.slides.length - 1;
+  renderTabs();
+  renderEditor();
+  renderQueue();
+  save();
+}
+
+// ════════════════════════════════════
+//  RENDER EDITOR
+// ════════════════════════════════════
+function renderEditor() {
+  const s = state.slides[state.activeSlide];
+  const el = document.getElementById('slideEditor');
+
+  el.innerHTML = `
+    <!-- Branding (only slide 1) -->
+    ${state.activeSlide === 0 ? `
+    <div class="section">
+      <div class="section-head"><span class="section-title">🎨 Channel Logo</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>Upload PNG Logo</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="file" accept="image/*" id="logoFileInput" style="color:var(--gray);background:var(--input-bg);border:1px solid var(--border);border-radius:4px;padding:6px;flex:1;font-size:12px">
+            <button class="btn btn-danger btn-sm" onclick="clearLogo()">✕</button>
+          </div>
+          ${state.logoUrl ? `<div style="margin-top:8px;background:#000;border-radius:4px;padding:6px;text-align:center"><img src="${state.logoUrl}" style="max-height:40px;max-width:140px;object-fit:contain"></div>` : ''}
+        </div>
+      </div>
+    </div>` : ''}
+
+    <!-- Headline -->
+    <div class="section">
+      <div class="section-head"><span class="section-title">📰 Headline & Banner</span></div>
+      <div class="section-body">
+        <div class="row2">
+          <div class="field">
+            <label>Banner Label</label>
+            <select id="bannerLabel">
+              <option value="BREAKING\nNEWS" ${s.bannerLabel==='BREAKING\nNEWS'?'selected':''}>BREAKING NEWS</option>
+              <option value="EXCLUSIVE" ${s.bannerLabel==='EXCLUSIVE'?'selected':''}>EXCLUSIVE</option>
+              <option value="JUST\nIN" ${s.bannerLabel==='JUST\nIN'?'selected':''}>JUST IN</option>
+              <option value="DEVELOPING\nSTORY" ${s.bannerLabel==='DEVELOPING\nSTORY'?'selected':''}>DEVELOPING</option>
+              <option value="SPECIAL\nREPORT" ${s.bannerLabel==='SPECIAL\nREPORT'?'selected':''}>SPECIAL REPORT</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Source Tag</label>
+            <input type="text" id="sourceTag" value="${s.source||'SUMANTV'}" placeholder="SUMANTV">
+          </div>
+        </div>
+        <div class="field">
+          <label>Headline Text</label>
+          <input type="text" id="headlineInput" value="${s.headline}" placeholder="e.g. 2 Dead After Mumbai Music Event">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bullets -->
+    <div class="section">
+      <div class="section-head"><span class="section-title">• Bullet Points (3–4)</span></div>
+      <div class="section-body" id="bulletFields">
+        ${s.bullets.map((b,i) => `
+          <div class="bullet-row">
+            <div class="bullet-num">${i+1}</div>
+            <input type="text" class="bullet-input" data-idx="${i}" value="${b}" placeholder="${i<3?'Required point '+(i+1):'Optional 4th point'}">
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Media -->
+    <div class="section">
+      <div class="section-head"><span class="section-title">🖼 Photo / Video</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>Media Type</label>
+          <select id="mediaTypeSelect">
+            <option value="none" ${s.mediaType==='none'?'selected':''}>— None —</option>
+            <option value="image" ${s.mediaType==='image'?'selected':''}>Photo (upload or URL)</option>
+            <option value="video" ${s.mediaType==='video'?'selected':''}>Video (YouTube or URL)</option>
+          </select>
+        </div>
+        <div id="mediaFields">
+          ${renderMediaFields(s)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Duration -->
+    <div class="section">
+      <div class="section-head"><span class="section-title">⏱ Slide Duration</span></div>
+      <div class="section-body">
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="range" id="durationRange" min="5" max="30" step="1" value="${s.duration}" style="flex:1">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);min-width:50px" id="durationLabel">${s.duration}s</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  bindEditorEvents();
+  renderQueue();
+}
+
+function renderMediaFields(s) {
+  if (s.mediaType === 'none') return '';
+  if (s.mediaType === 'image') {
+    return `
+      <div class="media-area">
+        <div class="media-thumb-preview">
+          ${s.mediaDataUrl || s.mediaUrl ? `<img src="${s.mediaDataUrl||s.mediaUrl}" id="thumbPreview">` : `<span class="no-img">🖼</span>`}
+        </div>
+        <div class="media-upload-zone">
+          <input type="file" accept="image/*" id="mediaFileInput">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text">UPLOAD PHOTO</div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <label>Or paste image URL</label>
+        <input type="url" id="mediaUrlInput" value="${s.mediaUrl}" placeholder="https://...">
+      </div>
+    `;
+  }
+  if (s.mediaType === 'video') {
+    return `
+      <div class="field">
+        <label>YouTube URL or direct video URL</label>
+        <input type="url" id="mediaUrlInput" value="${s.mediaUrl}" placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+      ${s.mediaUrl ? `<div style="font-size:11px;color:var(--green);margin-top:4px">✓ URL set: ${s.mediaUrl.substring(0,50)}...</div>` : ''}
+    `;
+  }
+  return '';
+}
+
+function bindEditorEvents() {
+  const s = state.slides[state.activeSlide];
+
+  // Logo
+  const logoInput = document.getElementById('logoFileInput');
+  if (logoInput) {
+    logoInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        state.logoUrl = ev.target.result;
+        updateViewerLogo();
+        save();
+        renderEditor(); // refresh preview
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+
+  // Banner label
+  const bl = document.getElementById('bannerLabel');
+  if (bl) bl.onchange = () => { s.bannerLabel = bl.value; save(); };
+
+  // Source tag
+  const st = document.getElementById('sourceTag');
+  if (st) st.oninput = () => { s.source = st.value; save(); };
+
+  // Headline
+  const hi = document.getElementById('headlineInput');
+  if (hi) hi.oninput = () => { s.headline = hi.value; renderTabs(); save(); if (isCurrentlyShowing()) renderSlideToViewer(state.currentSlide); };
+
+  // Bullets
+  document.querySelectorAll('.bullet-input').forEach(inp => {
+    inp.oninput = () => {
+      s.bullets[parseInt(inp.dataset.idx)] = inp.value;
+      save();
+      if (isCurrentlyShowing()) renderSlideToViewer(state.currentSlide);
+    };
+  });
+
+  // Media type
+  const mts = document.getElementById('mediaTypeSelect');
+  if (mts) mts.onchange = () => {
+    s.mediaType = mts.value;
+    s.mediaDataUrl = '';
+    if (mts.value === 'none') s.mediaUrl = '';
+    document.getElementById('mediaFields').innerHTML = renderMediaFields(s);
+    bindMediaFields(s);
+    save();
+    renderTabs();
+    renderQueue();
+  };
+  bindMediaFields(s);
+
+  // Duration
+  const dr = document.getElementById('durationRange');
+  if (dr) dr.oninput = () => {
+    s.duration = parseInt(dr.value);
+    document.getElementById('durationLabel').textContent = dr.value + 's';
+    renderQueue();
+    save();
+  };
+}
+
+function bindMediaFields(s) {
+  const fileInput = document.getElementById('mediaFileInput');
+  if (fileInput) {
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        s.mediaDataUrl = ev.target.result;
+        s.mediaUrl = '';
+        const thumb = document.getElementById('thumbPreview');
+        if (thumb) { thumb.src = ev.target.result; }
+        else {
+          const preview = document.querySelector('.media-thumb-preview');
+          if (preview) preview.innerHTML = `<img src="${ev.target.result}" id="thumbPreview" style="width:100%;height:100%;object-fit:cover">`;
+        }
+        renderTabs();
+        renderQueue();
+        save();
+        if (isCurrentlyShowing()) renderSlideToViewer(state.currentSlide);
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+  const urlInput = document.getElementById('mediaUrlInput');
+  if (urlInput) {
+    urlInput.oninput = () => {
+      s.mediaUrl = urlInput.value;
+      s.mediaDataUrl = '';
+      renderTabs();
+      renderQueue();
+      save();
+      if (isCurrentlyShowing()) renderSlideToViewer(state.currentSlide);
+    };
+  }
+}
+
+// ════════════════════════════════════
+//  RENDER QUEUE
+// ════════════════════════════════════
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  if (!state.slides.length) { list.innerHTML = '<div style="color:var(--gray);font-size:12px;padding:8px;text-align:center">No slides</div>'; return; }
+  list.innerHTML = state.slides.map((s, i) => `
+    <div class="q-item ${state.isPlaying && state.currentSlide === i ? 'playing' : ''}">
+      <div class="q-num ${state.isPlaying && state.currentSlide === i ? 'live' : ''}">${state.isPlaying && state.currentSlide === i ? '▶' : i+1}</div>
+      <div class="q-thumb">
+        ${(s.mediaDataUrl||s.mediaUrl) ? `<img src="${s.mediaDataUrl||s.mediaUrl.substring(0,200)}" onerror="this.style.display='none'">` : (s.mediaType==='video'?'VID':'—')}
+      </div>
+      <div class="q-info">
+        <div class="q-title">${s.headline || 'Untitled slide '+(i+1)}</div>
+        <div class="q-meta">
+          <span class="q-type ${s.mediaType==='video'?'vid':'img'}">${s.mediaType==='none'?'TEXT':s.mediaType.toUpperCase()}</span>
+          ${s.duration}s
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════
+//  VIEWER LOGIC
+// ════════════════════════════════════
+function updateViewerLogo() {
+  const img = document.getElementById('vLogoImg');
+  const txt = document.getElementById('vLogoText');
+  if (state.logoUrl) {
+    img.src = state.logoUrl;
+    img.style.display = 'block';
+    txt.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    txt.style.display = 'flex';
+  }
+}
+
+function renderTickerToViewer() {
+  const track = document.getElementById('vTickerTrack');
+  const items = [...state.tickerItems, ...state.tickerItems];
+  track.innerHTML = items.map(t => `<span class="v-ticker-item">${t}</span><span class="v-ticker-sep">◆</span>`).join('');
+}
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/\s]{11})/,
+    /youtube\.com\/shorts\/([^&?/\s]{11})/
+  ];
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
+let isMuted = true;
+
+function toggleMute() {
+  isMuted = !isMuted;
+  const btn = document.getElementById('vMuteBtn');
+  btn.textContent = isMuted ? '🔇' : '🔊';
+  btn.classList.toggle('unmuted', !isMuted);
+  const vid = document.querySelector('#vMedia video');
+  if (vid) vid.muted = isMuted;
+  const ifr = document.querySelector('#vMedia iframe');
+  if (ifr && ifr.src) {
+    ifr.src = ifr.src.replace(/mute=[01]/g, 'mute=' + (isMuted?'1':'0'));
+  }
+}
+
+function isCurrentlyShowing() { return state.isPlaying; }
+
+function flashTransition(cb) {
+  const flash = document.getElementById('vFlash');
+  flash.classList.add('active');
+  setTimeout(() => { flash.classList.remove('active'); cb && cb(); }, 220);
+}
+
+function renderSlideToViewer(idx) {
+  const s = state.slides[idx];
+  if (!s) return;
+
+  const media = document.getElementById('vMedia');
+  const idle = document.getElementById('vIdle');
+  const lower = document.getElementById('vLower');
+  const counter = document.getElementById('vSlideCounter');
+
+  // Hide idle
+  idle.style.display = 'none';
+  lower.style.display = 'block';
+  counter.style.display = 'block';
+  counter.textContent = `${idx+1} / ${state.slides.length}`;
+
+  // Clear old media (keep topbar, flash, counter, mute, timer)
+  const oldVid = media.querySelector('video');
+  const oldIframe = media.querySelector('iframe');
+  const oldImg = media.querySelector('img:not(.v-logo-img)');
+  const oldPlaceholder = media.querySelector('.v-media-placeholder');
+  if (oldVid) oldVid.remove();
+  if (oldIframe) oldIframe.remove();
+  if (oldImg) oldImg.remove();
+  if (oldPlaceholder) oldPlaceholder.remove();
+
+  const muteVal = isMuted ? '1' : '0';
+  const url = s.mediaDataUrl || s.mediaUrl;
+
+  if (s.mediaType === 'image' && url) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;';
+    media.insertBefore(img, media.firstChild);
+  } else if (s.mediaType === 'video' && url) {
+    const ytId = getYouTubeId(url);
+    if (ytId) {
+      const ifr = document.createElement('iframe');
+      ifr.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=${muteVal}&loop=1&playlist=${ytId}&controls=0&modestbranding=1&rel=0`;
+      ifr.allow = 'autoplay; encrypted-media';
+      ifr.allowFullscreen = true;
+      ifr.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
+      media.insertBefore(ifr, media.firstChild);
+    } else {
+      const vid = document.createElement('video');
+      vid.src = url;
+      vid.autoplay = true;
+      vid.muted = isMuted;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      media.insertBefore(vid, media.firstChild);
+    }
+  } else {
+    const ph = document.createElement('div');
+    ph.className = 'v-media-placeholder';
+    ph.innerHTML = '<span style="font-size:36px;opacity:0.15">📰</span><span>NO MEDIA</span>';
+    ph.style.cssText = 'position:absolute;inset:0;';
+    media.insertBefore(ph, media.firstChild);
+  }
+
+  // Breaking banner
+  const lblEl = document.getElementById('vBrkLabel');
+  lblEl.innerHTML = s.bannerLabel.replace('\\n','<br>').replace('\n','<br>');
+  document.getElementById('vHeadline').textContent = s.headline || '';
+  document.getElementById('vSource').textContent = s.source || 'SUMANTV';
+
+  // Bullets
+  const bulletsEl = document.getElementById('vBullets');
+  const activeBullets = s.bullets.filter(b => b && b.trim());
+  if (activeBullets.length) {
+    bulletsEl.style.display = 'flex';
+    bulletsEl.innerHTML = activeBullets.map(b => `
+      <div class="v-bullet">
+        <div class="v-bullet-dot"></div>
+        <div class="v-bullet-text">${b}</div>
+      </div>
+    `).join('');
+  } else {
+    bulletsEl.style.display = 'none';
+  }
+}
+
+// ════════════════════════════════════
+//  PLAYBACK ENGINE
+// ════════════════════════════════════
+let playInterval = null;
+let slideStartTime = null;
+let currentDuration = 0;
+
+function startBulletin() {
+  const hasContent = state.slides.some(s => s.headline.trim());
+  if (!hasContent) { alert('Add at least one headline to go live.'); return; }
+
+  state.isPlaying = true;
+  state.currentSlide = 0;
+  renderTabs();
+  renderQueue();
+  updateStatus('ON AIR', 'red');
+  document.getElementById('goLiveBtn').textContent = '↺ RESTART';
+
+  playSlide(0);
+}
+
+function playSlide(idx) {
+  state.currentSlide = idx;
+  const s = state.slides[idx];
+  currentDuration = s.duration * 1000;
+  slideStartTime = Date.now();
+
+  flashTransition(() => {
+    renderSlideToViewer(idx);
+    renderQueue();
+    updateGoLiveBar();
+    startSlideTimer(s.duration);
+  });
+}
+
+function startSlideTimer(durationSec) {
+  clearInterval(playInterval);
+  const totalMs = durationSec * 1000;
+  const circumference = 2 * Math.PI * 15; // r=15
+
+  playInterval = setInterval(() => {
+    const elapsed = Date.now() - slideStartTime;
+    const remaining = Math.max(0, totalMs - elapsed);
+    const pct = elapsed / totalMs;
+
+    // Timer ring
+    const arc = document.getElementById('timerArc');
+    const label = document.getElementById('timerLabel');
+    if (arc) {
+      const dashOffset = circumference * (1 - pct);
+      arc.style.strokeDasharray = circumference;
+      arc.style.strokeDashoffset = dashOffset;
+    }
+    if (label) label.textContent = Math.ceil(remaining / 1000);
+
+    // Timer strip on viewer
+    const strip = document.getElementById('vTimerStrip');
+    if (strip) strip.style.width = (pct * 100) + '%';
+
+    // Progress bar
+    const fill = document.getElementById('progressFill');
+    if (fill) fill.style.width = (pct * 100) + '%';
+
+    if (elapsed >= totalMs) {
+      // Advance to next slide
+      let next = state.currentSlide + 1;
+      if (next >= state.slides.length) next = 0; // loop
+      playSlide(next);
+    }
+  }, 200);
+}
+
+function stopBulletin() {
+  clearInterval(playInterval);
+  state.isPlaying = false;
+  state.currentSlide = 0;
+
+  // Reset viewer
+  document.getElementById('vIdle').style.display = 'flex';
+  document.getElementById('vLower').style.display = 'none';
+  document.getElementById('vSlideCounter').style.display = 'none';
+  document.getElementById('vTimerStrip').style.width = '0%';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('timerLabel').textContent = '—';
+  const arc = document.getElementById('timerArc');
+  if (arc) arc.style.strokeDashoffset = 100;
+
+  // Clear media
+  const media = document.getElementById('vMedia');
+  ['video','iframe','img:not(.v-logo-img)','.v-media-placeholder'].forEach(sel => {
+    media.querySelectorAll(sel).forEach(el => el.remove());
+  });
+
+  document.getElementById('goLiveBtn').textContent = '▶ GO LIVE';
+  updateStatus('STANDBY', 'gray');
+  renderQueue();
+  updateGoLiveBar();
+}
+
+function updateGoLiveBar() {
+  const label = document.getElementById('liveSlideLabel');
+  const title = document.getElementById('liveSlideTitles');
+  if (state.isPlaying) {
+    const s = state.slides[state.currentSlide];
+    label.textContent = `SLIDE ${state.currentSlide + 1} OF ${state.slides.length}`;
+    title.textContent = s.headline || '(No headline)';
+  } else {
+    label.textContent = 'NOT PLAYING';
+    title.textContent = '—';
+  }
+}
+
+function updateStatus(text, color) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot ' + color;
+}
+
+function clearLogo() {
+  state.logoUrl = '';
+  updateViewerLogo();
+  save();
+  renderEditor();
+}
+
+// ════════════════════════════════════
+//  INIT
+// ════════════════════════════════════
+renderTabs();
+renderEditor();
+renderTickerToViewer();
+updateViewerLogo();
+updateGoLiveBar();
+</script>
+</body>
+</html>
