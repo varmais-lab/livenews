@@ -942,6 +942,19 @@ function onFileUpload() {
 }
 
 // ─── PREVIEW ───
+function getYouTubeId(url) {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/\s]{11})/,
+    /youtube\.com\/shorts\/([^&?/\s]{11})/
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
 function updatePreview() {
   const t = gv('mediaType');
   const url = gv('mediaUrl');
@@ -950,12 +963,30 @@ function updatePreview() {
   const empty = document.getElementById('previewEmpty');
   const overlay = document.getElementById('previewOverlayText');
 
+  // Remove any existing iframe preview
+  const existingIframe = document.getElementById('previewIframe');
+  if (existingIframe) existingIframe.remove();
+
   if (t === 'image' && url) {
     img.src = url; img.style.display = 'block';
     vid.style.display = 'none'; empty.style.display = 'none';
   } else if (t === 'video' && url) {
-    vid.src = url; vid.style.display = 'block'; vid.load();
-    img.style.display = 'none'; empty.style.display = 'none';
+    const ytId = getYouTubeId(url);
+    if (ytId) {
+      // Show YouTube thumbnail as preview
+      img.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+      img.style.display = 'block';
+      vid.style.display = 'none'; empty.style.display = 'none';
+      // Add a YT badge
+      const badge = document.createElement('div');
+      badge.id = 'previewIframe';
+      badge.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:white;font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:8px 14px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);pointer-events:none;';
+      badge.textContent = '▶ YOUTUBE EMBED';
+      document.getElementById('previewPane').appendChild(badge);
+    } else {
+      vid.src = url; vid.style.display = 'block'; vid.load();
+      img.style.display = 'none'; empty.style.display = 'none';
+    }
   } else {
     empty.style.display = 'flex';
     img.style.display = 'none'; vid.style.display = 'none';
