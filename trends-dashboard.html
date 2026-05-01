@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trends Dashboard — Google & YouTube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --surface2: #f0efe9;
+      --border: rgba(0,0,0,0.09);
+      --border-strong: rgba(0,0,0,0.18);
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b65;
+      --text-muted: #9e9e96;
+      --accent-g: #4285F4;
+      --accent-y: #FF0000;
+      --accent-g-bg: #E8F0FE;
+      --accent-y-bg: #FFEAEA;
+      --green: #34A853;
+      --orange: #E65100;
+      --orange-bg: #FFF3E0;
+      --info-bg: #EEF3FF;
+      --info-text: #2d52b0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --font: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111110;
+        --surface: #1c1c1a;
+        --surface2: #242422;
+        --border: rgba(255,255,255,0.08);
+        --border-strong: rgba(255,255,255,0.18);
+        --text-primary: #f0efe9;
+        --text-secondary: #9e9d96;
+        --text-muted: #6b6b65;
+        --accent-g-bg: #1a2540;
+        --accent-y-bg: #2e1010;
+        --orange-bg: #2e1a08;
+        --info-bg: #1a2040;
+        --info-text: #7fa4f4;
+      }
+    }
+
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icons { display: flex; gap: 6px; align-items: center; }
+    .ic-g {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--accent-g); display: flex; align-items: center;
+      justify-content: center; color: #fff; font-size: 14px; font-weight: 600;
+    }
+    .ic-y {
+      width: 30px; height: 22px; border-radius: 5px;
+      background: var(--accent-y); display: flex; align-items: center; justify-content: center;
+    }
+    .ic-y svg { width: 16px; height: 16px; fill: #fff; }
+    .brand-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+    .brand-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .live-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    /* ── Controls panel ── */
+    .controls-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .controls-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .ctrl { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+    .ctrl-label {
+      font-size: 11px; font-weight: 500; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    select, .geo-select {
+      font-family: var(--font); font-size: 13px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong);
+      background: var(--surface2);
+      color: var(--text-primary);
+      width: 100%;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6b65'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+      cursor: pointer;
+    }
+    select:focus { outline: none; border-color: var(--accent-g); box-shadow: 0 0 0 3px rgba(66,133,244,0.15); }
+
+    .geo-toggle { display: flex; gap: 4px; margin-bottom: 6px; }
+    .geo-tab {
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border-strong);
+      background: transparent; color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .geo-tab.active {
+      background: var(--info-bg); color: var(--info-text);
+      border-color: var(--info-text);
+    }
+    .loc-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; min-height: 16px; }
+
+    .search-btn {
+      padding: 9px 22px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--text-primary);
+      color: var(--bg);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s, transform 0.1s;
+      align-self: flex-end;
+      flex-shrink: 0;
+    }
+    .search-btn:hover { opacity: 0.85; }
+    .search-btn:active { transform: scale(0.98); }
+    .search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Source tabs ── */
+    .source-tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .stab {
+      padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border-strong);
+      background: transparent; color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .stab.active-both { background: var(--surface2); color: var(--text-primary); border-color: var(--border-strong); }
+    .stab.active-g { background: var(--accent-g-bg); color: var(--accent-g); border-color: var(--accent-g); }
+    .stab.active-y { background: var(--accent-y-bg); color: var(--accent-y); border-color: var(--accent-y); }
+
+    /* ── Metrics row ── */
+    .metrics-row { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .metric {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 12px 16px;
+      flex: 1; min-width: 100px;
+      box-shadow: var(--shadow);
+    }
+    .metric-val { font-size: 24px; font-weight: 600; line-height: 1; }
+    .metric-lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── Status bar ── */
+    .status-bar {
+      font-size: 12px; color: var(--text-muted);
+      margin-bottom: 1rem; min-height: 18px;
+      font-family: var(--font-mono);
+    }
+
+    /* ── Trends grid ── */
+    .trends-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 12px;
+    }
+
+    .trend-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .trend-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    .card-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .rank {
+      font-size: 13px; font-weight: 600; color: var(--text-muted);
+      font-family: var(--font-mono); min-width: 26px; line-height: 1.4;
+    }
+    .src-badge {
+      width: 20px; height: 20px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .src-g { background: var(--accent-g); }
+    .src-y { background: var(--accent-y); }
+    .card-title { font-size: 14px; font-weight: 600; line-height: 1.35; flex: 1; }
+    .card-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    .badge {
+      font-size: 11px; padding: 2px 9px; border-radius: 20px;
+      font-weight: 500; white-space: nowrap;
+    }
+    .badge-cat { background: var(--info-bg); color: var(--info-text); }
+    .badge-vol { background: var(--surface2); color: var(--text-secondary); }
+    .badge-hot { background: var(--orange-bg); color: var(--orange); }
+    .card-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 10px; }
+    .vol-track { height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; margin-bottom: 8px; }
+    .vol-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+    .vol-g { background: var(--accent-g); }
+    .vol-y { background: var(--accent-y); }
+    .card-link {
+      font-size: 11px; color: var(--info-text); text-decoration: none;
+      font-weight: 500; display: inline-flex; align-items: center; gap: 3px;
+    }
+    .card-link:hover { text-decoration: underline; }
+
+    /* ── Skeleton ── */
+    .skel {
+      background: var(--surface2); border-radius: var(--radius-lg);
+      height: 120px; animation: shimmer 1.4s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%,100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      grid-column: 1/-1;
+      padding: 3rem 2rem; text-align: center;
+      color: var(--text-muted); font-size: 14px;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 3rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px;
+      font-size: 11px; color: var(--text-muted);
+    }
+    .footer a { color: var(--text-muted); text-decoration: none; }
+    .footer a:hover { color: var(--text-secondary); }
+
+    /* ── API Key modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 1rem;
+    }
+    .modal {
+      background: var(--surface); border-radius: var(--radius-xl);
+      padding: 2rem; max-width: 420px; width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
+    .modal input {
+      width: 100%; padding: 9px 12px; border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong); background: var(--surface2);
+      color: var(--text-primary); font-family: var(--font-mono);
+      font-size: 13px; margin-bottom: 12px;
+    }
+    .modal input:focus { outline: none; border-color: var(--accent-g); }
+    .modal-btns { display: flex; gap: 8px; }
+    .btn-primary {
+      flex: 1; padding: 9px; border-radius: var(--radius-md);
+      border: none; background: var(--text-primary); color: var(--bg);
+      font-family: var(--font); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.8; }
+    .btn-secondary {
+      padding: 9px 16px; border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong); background: transparent;
+      color: var(--text-secondary); font-family: var(--font);
+      font-size: 13px; cursor: pointer;
+    }
+    .modal-note {
+      font-size: 11px; color: var(--text-muted);
+      margin-top: 10px; line-height: 1.6;
+    }
+    .modal-note a { color: var(--info-text); }
+    .key-indicator {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--text-muted); cursor: pointer;
+    }
+    .key-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+    .key-dot.set { background: var(--green); }
+
+    @media (max-width: 600px) {
+      .controls-row { flex-direction: column; }
+      .search-btn { width: 100%; text-align: center; }
+      .metrics-row { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- API Key Modal -->
+<div class="modal-backdrop" id="apiModal">
+  <div class="modal">
+    <h2>🔑 Anthropic API Key</h2>
+    <p>This dashboard uses the Anthropic API to search for live trends. Enter your API key to get started. It's stored only in your browser's local storage and never sent anywhere except Anthropic's servers.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" />
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveKey()">Save & Continue</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+    <p class="modal-note">
+      Get a free API key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+      Your key is stored locally and never shared.
+    </p>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icons">
+        <div class="ic-g">G</div>
+        <div class="ic-y">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.1a8.16 8.16 0 004.79 1.52V7.18a4.85 4.85 0 01-1.02-.49z"/></svg>
+        </div>
+      </div>
+      <div>
+        <div class="brand-title">Trends Dashboard</div>
+        <div class="brand-sub">Google & YouTube · Live via AI search</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        <span>Live</span>
+      </div>
+      <div class="key-indicator" onclick="showModal()" title="Change API key">
+        <div class="key-dot" id="keyDot"></div>
+        <span id="keyLabel">No API key</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <div class="controls-panel">
+    <div class="controls-row">
+
+      <!-- Location -->
+      <div class="ctrl" style="min-width:180px;">
+        <span class="ctrl-label">Location</span>
+        <div class="geo-toggle">
+          <div class="geo-tab active" id="gtab-india" onclick="switchGeoMode('india')">India states</div>
+          <div class="geo-tab" id="gtab-global" onclick="switchGeoMode('global')">Global</div>
+        </div>
+
+        <select id="geo-india">
+          <optgroup label="— Popular —">
+            <option value="IN-TG" data-name="Telangana" data-city="Hyderabad & Secunderabad">Telangana (Hyderabad)</option>
+            <option value="IN-AP" data-name="Andhra Pradesh" data-city="Vijayawada, Visakhapatnam">Andhra Pradesh</option>
+            <option value="IN-MH" data-name="Maharashtra" data-city="Mumbai & Pune">Maharashtra (Mumbai)</option>
+            <option value="IN-DL" data-name="Delhi" data-city="Delhi NCR, Noida, Gurugram">Delhi (NCR)</option>
+            <option value="IN-KA" data-name="Karnataka" data-city="Bengaluru">Karnataka (Bengaluru)</option>
+            <option value="IN-TN" data-name="Tamil Nadu" data-city="Chennai & Coimbatore">Tamil Nadu (Chennai)</option>
+          </optgroup>
+          <optgroup label="— All states —">
+            <option value="IN-AN" data-name="Andaman and Nicobar Islands" data-city="">Andaman & Nicobar</option>
+            <option value="IN-AR" data-name="Arunachal Pradesh" data-city="">Arunachal Pradesh</option>
+            <option value="IN-AS" data-name="Assam" data-city="Guwahati">Assam</option>
+            <option value="IN-BR" data-name="Bihar" data-city="Patna">Bihar</option>
+            <option value="IN-CH" data-name="Chandigarh" data-city="">Chandigarh</option>
+            <option value="IN-CT" data-name="Chhattisgarh" data-city="Raipur">Chhattisgarh</option>
+            <option value="IN-GA" data-name="Goa" data-city="Panaji">Goa</option>
+            <option value="IN-GJ" data-name="Gujarat" data-city="Ahmedabad, Surat">Gujarat</option>
+            <option value="IN-HR" data-name="Haryana" data-city="Faridabad, Gurugram">Haryana</option>
+            <option value="IN-HP" data-name="Himachal Pradesh" data-city="Shimla">Himachal Pradesh</option>
+            <option value="IN-JK" data-name="Jammu and Kashmir" data-city="Srinagar">Jammu & Kashmir</option>
+            <option value="IN-JH" data-name="Jharkhand" data-city="Ranchi">Jharkhand</option>
+            <option value="IN-KL" data-name="Kerala" data-city="Kochi, Thiruvananthapuram">Kerala</option>
+            <option value="IN-LA" data-name="Ladakh" data-city="Leh">Ladakh</option>
+            <option value="IN-LD" data-name="Lakshadweep" data-city="">Lakshadweep</option>
+            <option value="IN-MP" data-name="Madhya Pradesh" data-city="Bhopal, Indore">Madhya Pradesh</option>
+            <option value="IN-MN" data-name="Manipur" data-city="Imphal">Manipur</option>
+            <option value="IN-ML" data-name="Meghalaya" data-city="Shillong">Meghalaya</option>
+            <option value="IN-MZ" data-name="Mizoram" data-city="Aizawl">Mizoram</option>
+            <option value="IN-NL" data-name="Nagaland" data-city="Kohima">Nagaland</option>
+            <option value="IN-OR" data-name="Odisha" data-city="Bhubaneswar">Odisha</option>
+            <option value="IN-PY" data-name="Puducherry" data-city="">Puducherry</option>
+            <option value="IN-PB" data-name="Punjab" data-city="Ludhiana, Amritsar">Punjab</option>
+            <option value="IN-RJ" data-name="Rajasthan" data-city="Jaipur, Jodhpur">Rajasthan</option>
+            <option value="IN-SK" data-name="Sikkim" data-city="Gangtok">Sikkim</option>
+            <option value="IN-TR" data-name="Tripura" data-city="Agartala">Tripura</option>
+            <option value="IN-UP" data-name="Uttar Pradesh" data-city="Lucknow, Kanpur, Agra">Uttar Pradesh</option>
+            <option value="IN-UT" data-name="Uttarakhand" data-city="Dehradun">Uttarakhand</option>
+            <option value="IN-WB" data-name="West Bengal" data-city="Kolkata">West Bengal</option>
+          </optgroup>
+        </select>
+
+        <select id="geo-global" style="display:none;">
+          <option value="IN" data-name="India" data-city="">India</option>
+          <option value="US" data-name="United States" data-city="">United States</option>
+          <option value="GB" data-name="United Kingdom" data-city="">United Kingdom</option>
+          <option value="AU" data-name="Australia" data-city="">Australia</option>
+          <option value="CA" data-name="Canada" data-city="">Canada</option>
+          <option value="DE" data-name="Germany" data-city="">Germany</option>
+          <option value="FR" data-name="France" data-city="">France</option>
+          <option value="JP" data-name="Japan" data-city="">Japan</option>
+          <option value="BR" data-name="Brazil" data-city="">Brazil</option>
+          <option value="ZA" data-name="South Africa" data-city="">South Africa</option>
+          <option value="SG" data-name="Singapore" data-city="">Singapore</option>
+          <option value="AE" data-name="UAE" data-city="">UAE</option>
+          <option value="PK" data-name="Pakistan" data-city="">Pakistan</option>
+          <option value="NG" data-name="Nigeria" data-city="">Nigeria</option>
+          <option value="PH" data-name="Philippines" data-city="">Philippines</option>
+          <option value="MY" data-name="Malaysia" data-city="">Malaysia</option>
+          <option value="KR" data-name="South Korea" data-city="">South Korea</option>
+          <option value="MX" data-name="Mexico" data-city="">Mexico</option>
+        </select>
+
+        <div class="loc-hint" id="locHint">Closest to Hyderabad & Secunderabad trends</div>
+      </div>
+
+      <!-- Category -->
+      <div class="ctrl">
+        <span class="ctrl-label">Category</span>
+        <select id="category">
+          <option value="all">All categories</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Sports">Sports</option>
+          <option value="Technology">Technology</option>
+          <option value="Business and Finance">Business & Finance</option>
+          <option value="Politics">Politics</option>
+          <option value="Health">Health</option>
+          <option value="Science">Science</option>
+          <option value="Games">Games</option>
+          <option value="Travel and Transportation">Travel</option>
+          <option value="Food and Drink">Food & Drink</option>
+          <option value="Beauty and Fashion">Beauty & Fashion</option>
+          <option value="Autos and Vehicles">Autos & Vehicles</option>
+          <option value="Law and Government">Law & Government</option>
+        </select>
+      </div>
+
+      <!-- Timeframe -->
+      <div class="ctrl">
+        <span class="ctrl-label">Timeframe</span>
+        <select id="timeframe">
+          <option value="today">Today</option>
+          <option value="this week">This week</option>
+          <option value="this month">This month</option>
+        </select>
+      </div>
+
+      <button class="search-btn" id="fetchBtn" onclick="fetchTrends()">Search trends →</button>
+    </div>
+  </div>
+
+  <!-- Source tabs -->
+  <div class="source-tabs">
+    <div class="stab active-both" id="stab-both" onclick="filterSource('both')">All sources</div>
+    <div class="stab" id="stab-g" onclick="filterSource('google')">Google Trends</div>
+    <div class="stab" id="stab-y" onclick="filterSource('youtube')">YouTube Trends</div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="metrics-row" id="metricsRow" style="display:none;">
+    <div class="metric">
+      <div class="metric-val" id="m-total">0</div>
+      <div class="metric-lbl">Total trends</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" id="m-google" style="color:var(--accent-g)">0</div>
+      <div class="metric-lbl">Google</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" id="m-youtube" style="color:var(--accent-y)">0</div>
+      <div class="metric-lbl">YouTube</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" id="m-cat" style="font-size:15px;">—</div>
+      <div class="metric-lbl">Top category</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" id="m-loc" style="font-size:14px;">—</div>
+      <div class="metric-lbl">Location</div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">Select your filters and click "Search trends" to load live data.</div>
+
+  <!-- Grid -->
+  <div class="trends-grid" id="trendsGrid">
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <div>Configure your filters above and click <strong>Search trends</strong> to load live trending topics.</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>Trends Dashboard · Powered by Anthropic Claude + Web Search</span>
+    <span>Data sourced live · Not affiliated with Google or YouTube</span>
+  </footer>
+
+</div>
+
+<script>
+  // ── State ──
+  let allTrends = [];
+  let currentSource = 'both';
+  let geoMode = 'india';
+
+  // ── API Key management ──
+  function getKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+  function saveKey() {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val) { alert('Please enter a valid API key.'); return; }
+    localStorage.setItem('anthropic_api_key', val);
+    updateKeyUI();
+    closeModal();
+  }
+  function showModal() {
+    document.getElementById('apiKeyInput').value = getKey();
+    document.getElementById('apiModal').style.display = 'flex';
+  }
+  function closeModal() {
+    document.getElementById('apiModal').style.display = 'none';
+  }
+  function updateKeyUI() {
+    const has = !!getKey();
+    document.getElementById('keyDot').className = 'key-dot' + (has ? ' set' : '');
+    document.getElementById('keyLabel').textContent = has ? 'API key set' : 'No API key';
+  }
+
+  // ── Geo mode ──
+  function switchGeoMode(mode) {
+    geoMode = mode;
+    document.getElementById('gtab-india').className = 'geo-tab' + (mode === 'india' ? ' active' : '');
+    document.getElementById('gtab-global').className = 'geo-tab' + (mode === 'global' ? ' active' : '');
+    document.getElementById('geo-india').style.display = mode === 'india' ? '' : 'none';
+    document.getElementById('geo-global').style.display = mode === 'global' ? '' : 'none';
+    updateHint();
+  }
+
+  function getActiveGeo() {
+    const sel = geoMode === 'india'
+      ? document.getElementById('geo-india')
+      : document.getElementById('geo-global');
+    const opt = sel.options[sel.selectedIndex];
+    return {
+      code: opt.value,
+      name: opt.getAttribute('data-name') || opt.text,
+      city: opt.getAttribute('data-city') || ''
+    };
+  }
+
+  function updateHint() {
+    const geo = getActiveGeo();
+    const hint = document.getElementById('locHint');
+    if (geoMode === 'india' && geo.city) {
+      hint.textContent = 'Closest to ' + geo.city + ' trends';
+    } else if (geoMode === 'india') {
+      hint.textContent = 'State-level (most granular available)';
+    } else {
+      hint.textContent = 'Country-level trends';
+    }
+  }
+
+  document.getElementById('geo-india').addEventListener('change', updateHint);
+  document.getElementById('geo-global').addEventListener('change', updateHint);
+
+  // ── Source filter ──
+  function filterSource(src) {
+    currentSource = src;
+    ['both','g','y'].forEach(t => document.getElementById('stab-' + t).className = 'stab');
+    if (src === 'both') document.getElementById('stab-both').className = 'stab active-both';
+    else if (src === 'google') document.getElementById('stab-g').className = 'stab active-g';
+    else document.getElementById('stab-y').className = 'stab active-y';
+    renderTrends();
+  }
+
+  // ── Render ──
+  function renderTrends() {
+    const grid = document.getElementById('trendsGrid');
+    let filtered = allTrends;
+    if (currentSource === 'google') filtered = allTrends.filter(t => t.source === 'google');
+    if (currentSource === 'youtube') filtered = allTrends.filter(t => t.source === 'youtube');
+
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div>No trends found for this filter.</div></div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map((t, i) => {
+      const isYT = t.source === 'youtube';
+      const volPct = Math.min(100, t.volume_score || Math.max(10, 95 - i * 5));
+      return `
+      <article class="trend-card">
+        <div class="card-top">
+          <span class="rank">${String(i + 1).padStart(2, '0')}</span>
+          <div class="src-badge ${isYT ? 'src-y' : 'src-g'}">${isYT ? 'Y' : 'G'}</div>
+          <span class="card-title">${escHtml(t.title)}</span>
+        </div>
+        <div class="card-badges">
+          ${t.category ? `<span class="badge badge-cat">${escHtml(t.category)}</span>` : ''}
+          ${t.search_volume ? `<span class="badge badge-vol">${escHtml(t.search_volume)}</span>` : ''}
+          ${t.is_breaking ? `<span class="badge badge-hot">🔥 Trending</span>` : ''}
+        </div>
+        ${t.description ? `<p class="card-desc">${escHtml(t.description)}</p>` : ''}
+        <div class="vol-track"><div class="${isYT ? 'vol-fill vol-y' : 'vol-fill vol-g'}" style="width:${volPct}%"></div></div>
+        ${t.link ? `<a class="card-link" href="${escHtml(t.link)}" target="_blank" rel="noopener">View on ${isYT ? 'YouTube' : 'Google'} →</a>` : ''}
+      </article>`;
+    }).join('');
+  }
+
+  function escHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function updateMetrics(geoName) {
+    const g = allTrends.filter(t => t.source === 'google').length;
+    const y = allTrends.filter(t => t.source === 'youtube').length;
+    document.getElementById('m-total').textContent = allTrends.length;
+    document.getElementById('m-google').textContent = g;
+    document.getElementById('m-youtube').textContent = y;
+    const freq = {};
+    allTrends.forEach(t => t.category && (freq[t.category] = (freq[t.category]||0)+1));
+    const topCat = Object.entries(freq).sort((a,b) => b[1]-a[1])[0];
+    document.getElementById('m-cat').textContent = topCat ? topCat[0] : '—';
+    document.getElementById('m-loc').textContent = geoName;
+    document.getElementById('metricsRow').style.display = 'flex';
+  }
+
+  // ── Fetch ──
+  async function fetchTrends() {
+    const apiKey = getKey();
+    if (!apiKey) { showModal(); return; }
+
+    const geo = getActiveGeo();
+    const cat = document.getElementById('category').value;
+    const tf = document.getElementById('timeframe').value;
+    const catLabel = cat === 'all' ? 'all categories' : cat;
+    const isState = geo.code.startsWith('IN-');
+
+    const btn = document.getElementById('fetchBtn');
+    btn.disabled = true;
+    btn.textContent = 'Fetching...';
+    document.getElementById('statusBar').textContent = `Searching live trends for ${geo.name} · ${catLabel}...`;
+
+    const grid = document.getElementById('trendsGrid');
+    grid.innerHTML = Array(8).fill('<div class="skel"></div>').join('');
+    document.getElementById('metricsRow').style.display = 'none';
+
+    const locationContext = isState
+      ? `${geo.name} state in India (Google Trends region code: ${geo.code})${geo.city ? ', covering cities like ' + geo.city : ''}. This is the most granular level available — city-level is not supported by Google Trends.`
+      : `${geo.name} (country-level)`;
+
+    const prompt = `You are a trends analyst. Search the web RIGHT NOW for live trending topics for:
+- Location: ${locationContext}
+- Category: ${catLabel}
+- Timeframe: ${tf}
+
+Find 12 trending topics — a mix of Google Search trends and YouTube trending content relevant to this region.
+
+Return ONLY valid JSON, no markdown, no extra text:
+{
+  "trends": [
+    {
+      "title": "Trend name",
+      "source": "google",
+      "category": "category name",
+      "search_volume": "e.g. 500K+ searches or null",
+      "description": "1-2 sentences on why this is trending right now",
+      "is_breaking": true,
+      "volume_score": 85,
+      "link": "https://trends.google.com/trends/explore?q=TOPIC&geo=${geo.code}"
+    }
+  ]
+}
+Rules:
+- Use real current trending topics — search the web
+- Prioritize regionally relevant content for ${geo.name}
+- Mix: ~7 Google trends, ~5 YouTube trends
+- volume_score: 0-100
+- Category: ${cat === 'all' ? 'include all' : `only "${cat}"`}
+- Encode spaces as + in URLs`;
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      if (resp.status === 401) { alert('Invalid API key. Please check and try again.'); showModal(); return; }
+      if (!resp.ok) throw new Error('API error ' + resp.status);
+
+      const data = await resp.json();
+      let jsonText = '';
+      for (const block of data.content) {
+        if (block.type === 'text') jsonText += block.text;
+      }
+
+      jsonText = jsonText.replace(/```json|```/g, '').trim();
+      const start = jsonText.indexOf('{');
+      const end = jsonText.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('No JSON in response');
+
+      const parsed = JSON.parse(jsonText.slice(start, end + 1));
+      allTrends = (parsed.trends || []).sort((a, b) => (b.volume_score||0) - (a.volume_score||0));
+
+      updateMetrics(geo.name);
+      renderTrends();
+
+      const now = new Date().toLocaleTimeString();
+      document.getElementById('statusBar').textContent = `Showing ${allTrends.length} trends for ${geo.name} · ${catLabel} · Updated at ${now}`;
+
+    } catch (e) {
+      document.getElementById('statusBar').textContent = 'Error fetching trends. Please try again.';
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div>Could not load trends. Check your API key and try again.</div></div>';
+      console.error(e);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Search trends →';
+    }
+  }
+
+  // ── Init ──
+  updateKeyUI();
+  updateHint();
+  if (!getKey()) showModal();
+</script>
+</body>
+</html>
