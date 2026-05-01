@@ -492,7 +492,7 @@
   let geoMode = 'india';
 
   // ── API Key ──
-  const ANTHROPIC_API_KEY = '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';
+  const ANTHROPIC_API_KEY = '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';
   function getKey() { return ANTHROPIC_API_KEY; }
   function showModal() {}
   function closeModal() {}
@@ -655,6 +655,7 @@ Rules:
 - Encode spaces as + in URLs`;
 
     try {
+      console.log('Using API key starting with:', apiKey.slice(0, 12) + '...');
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -671,16 +672,11 @@ Rules:
         })
       });
 
-      if (resp.status === 401) {
-        alert('Invalid API key. Please check and try again.');
-        showModal();
-        return;
-      }
-
       const data = await resp.json();
+      console.log('Anthropic status:', resp.status, JSON.stringify(data).slice(0, 400));
 
       if (!resp.ok) {
-        const errMsg = data?.error?.message || ('API error ' + resp.status);
+        const errMsg = data?.error?.message || ('HTTP ' + resp.status);
         throw new Error(errMsg);
       }
 
