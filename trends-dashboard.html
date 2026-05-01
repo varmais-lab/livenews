@@ -279,50 +279,8 @@
     .footer a { color: var(--text-muted); text-decoration: none; }
     .footer a:hover { color: var(--text-secondary); }
 
-    /* ── API Key modal ── */
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100; padding: 1rem;
-    }
-    .modal {
-      background: var(--surface); border-radius: var(--radius-xl);
-      padding: 2rem; max-width: 420px; width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    .modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
-    .modal input {
-      width: 100%; padding: 9px 12px; border-radius: var(--radius-md);
-      border: 1px solid var(--border-strong); background: var(--surface2);
-      color: var(--text-primary); font-family: var(--font-mono);
-      font-size: 13px; margin-bottom: 12px;
-    }
-    .modal input:focus { outline: none; border-color: var(--accent-g); }
-    .modal-btns { display: flex; gap: 8px; }
-    .btn-primary {
-      flex: 1; padding: 9px; border-radius: var(--radius-md);
-      border: none; background: var(--text-primary); color: var(--bg);
-      font-family: var(--font); font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: opacity 0.15s;
-    }
-    .btn-primary:hover { opacity: 0.8; }
-    .btn-secondary {
-      padding: 9px 16px; border-radius: var(--radius-md);
-      border: 1px solid var(--border-strong); background: transparent;
-      color: var(--text-secondary); font-family: var(--font);
-      font-size: 13px; cursor: pointer;
-    }
-    .modal-note {
-      font-size: 11px; color: var(--text-muted);
-      margin-top: 10px; line-height: 1.6;
-    }
-    .modal-note a { color: var(--info-text); }
-    .key-indicator {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; color: var(--text-muted); cursor: pointer;
-    }
-    .key-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+    .key-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .key-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
     .key-dot.set { background: var(--green); }
 
     @media (max-width: 600px) {
@@ -334,22 +292,7 @@
 </head>
 <body>
 
-<!-- API Key Modal -->
-<div class="modal-backdrop" id="apiModal">
-  <div class="modal">
-    <h2>🔑 Anthropic API Key</h2>
-    <p>This dashboard uses the Anthropic API to search for live trends. Enter your API key to get started. It's stored only in your browser's local storage and never sent anywhere except Anthropic's servers.</p>
-    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" />
-    <div class="modal-btns">
-      <button class="btn-primary" onclick="saveKey()">Save & Continue</button>
-      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-    </div>
-    <p class="modal-note">
-      Get a free API key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
-      Your key is stored locally and never shared.
-    </p>
-  </div>
-</div>
+
 
 <div class="page">
 
@@ -372,7 +315,7 @@
         <div class="live-dot"></div>
         <span>Live</span>
       </div>
-      <div class="key-indicator" onclick="showModal()" title="Change API key">
+      <div class="key-indicator">
         <div class="key-dot" id="keyDot"></div>
         <span id="keyLabel">No API key</span>
       </div>
@@ -548,26 +491,14 @@
   let currentSource = 'both';
   let geoMode = 'india';
 
-  // ── API Key management ──
-  function getKey() { return localStorage.getItem('anthropic_api_key') || ''; }
-  function saveKey() {
-    const val = document.getElementById('apiKeyInput').value.trim();
-    if (!val) { alert('Please enter a valid API key.'); return; }
-    localStorage.setItem('anthropic_api_key', val);
-    updateKeyUI();
-    closeModal();
-  }
-  function showModal() {
-    document.getElementById('apiKeyInput').value = getKey();
-    document.getElementById('apiModal').style.display = 'flex';
-  }
-  function closeModal() {
-    document.getElementById('apiModal').style.display = 'none';
-  }
+  // ── API Key ──
+  const ANTHROPIC_API_KEY = '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';
+  function getKey() { return ANTHROPIC_API_KEY; }
+  function showModal() {}
+  function closeModal() {}
   function updateKeyUI() {
-    const has = !!getKey();
-    document.getElementById('keyDot').className = 'key-dot' + (has ? ' set' : '');
-    document.getElementById('keyLabel').textContent = has ? 'API key set' : 'No API key';
+    document.getElementById('keyDot').className = 'key-dot set';
+    document.getElementById('keyLabel').textContent = 'API key set';
   }
 
   // ── Geo mode ──
@@ -733,17 +664,26 @@ Rules:
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
+          model: 'claude-sonnet-4-5',
+          max_tokens: 2000,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
           messages: [{ role: 'user', content: prompt }]
         })
       });
 
-      if (resp.status === 401) { alert('Invalid API key. Please check and try again.'); showModal(); return; }
-      if (!resp.ok) throw new Error('API error ' + resp.status);
+      if (resp.status === 401) {
+        alert('Invalid API key. Please check and try again.');
+        showModal();
+        return;
+      }
 
       const data = await resp.json();
+
+      if (!resp.ok) {
+        const errMsg = data?.error?.message || ('API error ' + resp.status);
+        throw new Error(errMsg);
+      }
+
       let jsonText = '';
       for (const block of data.content) {
         if (block.type === 'text') jsonText += block.text;
@@ -752,7 +692,7 @@ Rules:
       jsonText = jsonText.replace(/```json|```/g, '').trim();
       const start = jsonText.indexOf('{');
       const end = jsonText.lastIndexOf('}');
-      if (start === -1 || end === -1) throw new Error('No JSON in response');
+      if (start === -1 || end === -1) throw new Error('Model returned no structured data. Try again.');
 
       const parsed = JSON.parse(jsonText.slice(start, end + 1));
       allTrends = (parsed.trends || []).sort((a, b) => (b.volume_score||0) - (a.volume_score||0));
@@ -764,9 +704,10 @@ Rules:
       document.getElementById('statusBar').textContent = `Showing ${allTrends.length} trends for ${geo.name} · ${catLabel} · Updated at ${now}`;
 
     } catch (e) {
-      document.getElementById('statusBar').textContent = 'Error fetching trends. Please try again.';
-      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div>Could not load trends. Check your API key and try again.</div></div>';
-      console.error(e);
+      const msg = e.message || 'Unknown error';
+      document.getElementById('statusBar').textContent = '⚠️ Error: ' + msg;
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div><strong>Error:</strong> ${msg}<br><br>Check your API key and try again.</div></div>`;
+      console.error('Trends fetch error:', e);
     } finally {
       btn.disabled = false;
       btn.textContent = 'Search trends →';
@@ -776,7 +717,6 @@ Rules:
   // ── Init ──
   updateKeyUI();
   updateHint();
-  if (!getKey()) showModal();
 </script>
 </body>
 </html>
