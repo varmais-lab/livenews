@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SumanTV Breaking News Broadcast</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;700;900&family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --red: #E8001D;
+      --gold: #F5A800;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: #111;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      cursor: default;
+    }
+
+    /* ══ CONFIG PANEL ══ */
+    #config-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .config-box {
+      background: #111827;
+      border: 1px solid #2d3748;
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 0 60px rgba(232, 0, 29, 0.15);
+    }
+
+    .config-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    .config-logo-row img {
+      height: 52px;
+      width: auto;
+      filter: drop-shadow(0 0 8px rgba(232, 0, 29, 0.4));
+    }
+
+    .config-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 1px;
+      line-height: 1.1;
+    }
+
+    .config-brand span {
+      color: var(--red);
+    }
+
+    .config-sub {
+      font-size: 11px;
+      color: #6b7280;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .config-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 2rem;
+    }
+
+    .config-title span {
+      color: var(--red);
+    }
+
+    .field-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .field-group input,
+    .field-group textarea {
+      width: 100%;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+
+    .field-group input:focus,
+    .field-group textarea:focus {
+      border-color: var(--red);
+    }
+
+    .field-group input::placeholder,
+    .field-group textarea::placeholder {
+      color: #4b5563;
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: #4b5563;
+      margin-top: 6px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .shortcut-note {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 1.5rem;
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.7;
+    }
+
+    .shortcut-note strong {
+      color: #fff;
+    }
+
+    .kbd {
+      display: inline-block;
+      background: #374151;
+      border: 1px solid #4b5563;
+      border-radius: 4px;
+      padding: 1px 8px;
+      font-size: 12px;
+      color: #fff;
+      font-family: monospace;
+    }
+
+    .go-live-btn {
+      width: 100%;
+      margin-top: 2rem;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 3px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .go-live-btn:hover {
+      background: #c0001a;
+    }
+
+    .go-live-btn:active {
+      transform: scale(0.98);
+    }
+
+    .pulse-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulse-btn 1.2s infinite;
+    }
+
+    @keyframes pulse-btn {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.65);
+      }
+    }
+
+    /* ══ BROADCAST VIEW ══ */
+    #broadcast {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(to bottom,
+          rgba(0, 0, 0, 0.35) 0%,
+          rgba(0, 0, 0, 0.15) 35%,
+          rgba(0, 0, 0, 0.5) 70%,
+          rgba(0, 0, 0, 0.82) 100%);
+    }
+
+    .ui-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 22px 28px 0;
+    }
+
+    .top-right {
+      text-align: right;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 18px;
+      backdrop-filter: blur(8px);
+      min-width: 190px;
+    }
+
+    .top-location {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+
+    .top-time {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px;
+      color: #fff;
+      letter-spacing: 1px;
+      line-height: 1.05;
+    }
+
+    .top-date {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.5px;
+      margin-top: 1px;
+    }
+
+    /* LIVE badge — top-left absolute */
+    .live-badge {
+      position: absolute;
+      top: 22px;
+      left: 110px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--red);
+      border-radius: 5px;
+      padding: 5px 14px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: #fff;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.15;
+      }
+    }
+
+    .flex-grow {
+      flex: 1;
+    }
+
+    /* ── HEADLINE BLOCK ── */
+    .headline-block {
+      padding: 0 28px 18px;
+    }
+
+    .breaking-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red);
+      padding: 4px 20px 4px 14px;
+      clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%);
+      margin-bottom: 12px;
+    }
+
+    .breaking-label-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 3px;
+      color: #fff;
+    }
+
+    .headline-text {
+      font-family: 'Noto Sans Telugu', 'Barlow Condensed', sans-serif;
+      font-size: clamp(26px, 3.8vw, 50px);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.18;
+      text-shadow: 0 2px 24px rgba(0, 0, 0, 0.9), 0 0 60px rgba(0, 0, 0, 0.6);
+      max-width: 82%;
+    }
+
+    .accent-line {
+      height: 3px;
+      background: linear-gradient(90deg, var(--red) 0%, var(--gold) 55%, transparent 100%);
+      margin: 12px 0 0;
+      max-width: 65%;
+    }
+
+    /* ── LOGO bottom-left ── */
+    .broadcast-logo {
+      position: absolute;
+      top: 18px;
+      left: 24px;
+      z-index: 10;
+      height: 60px;
+      width: auto;
+      filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.7));
+      opacity: 0.95;
+    }
+
+    /* ── TICKER ── */
+    .ticker-strip {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      border-top: 3px solid var(--red);
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      flex-shrink: 0;
+      min-height: 50px;
+    }
+
+    .ticker-label {
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 22px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 17px;
+      letter-spacing: 3px;
+      color: #fff;
+      white-space: nowrap;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .ticker-label::after {
+      content: '';
+      position: absolute;
+      right: -13px;
+      top: 0;
+      bottom: 0;
+      width: 13px;
+      background: var(--red);
+      clip-path: polygon(0 0, 0 100%, 100% 50%);
+    }
+
+    .ticker-track {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding-left: 26px;
+    }
+
+    .ticker-inner {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      animation: scroll-ticker linear infinite;
+    }
+
+    .ticker-item {
+      font-family: 'Noto Sans Telugu', 'Barlow', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .ticker-sep {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin: 0 20px;
+      flex-shrink: 0;
+    }
+
+    @keyframes scroll-ticker {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ CONFIG PANEL ══ -->
+  <div id="config-panel">
+    <div class="config-box">
+
+      <div class="config-logo-row">
+        <img src="./SumanTV_News_Logo__1_.png" alt="SumanTV" onerror="this.style.display='none'">
+        <div>
+          <div class="config-brand">SuamnTV <span>NEWS</span></div>
+          <div class="config-sub">Breaking News Broadcast Studio</div>
+        </div>
+      </div>
+
+      <div class="config-title"><span>●</span> Configure Broadcast</div>
+
+      <div class="field-group">
+        <label class="field-label">Background Video Path / URL</label>
+        <input type="text" id="video-path" placeholder="e.g. http://localhost:8000/background.mp4" />
+        <div class="field-hint">Local file: run <strong style="color:#fff">python -m http.server 8000</strong> in your
+          video folder, then use <strong style="color:#fff">http://localhost:8000/filename.mp4</strong></div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Breaking News Headline</label>
+        <textarea id="headline-input" rows="3" placeholder="Enter your headline here… (Telugu or English)"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Ticker Highlights</label>
+        <textarea id="ticker-input" rows="4" placeholder="Highlight 1 | Highlight 2 | Highlight 3"></textarea>
+        <div class="field-hint">Separate each item with a pipe <strong style="color:#fff">|</strong></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Location</label>
+          <input type="text" id="location-input" placeholder="e.g. Hyderabad" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Ticker Speed</label>
+          <input type="range" id="speed-input" min="20" max="100" value="45" style="width:100%; margin-top:8px;" />
+          <div class="field-hint">Slow ←→ Fast</div>
+        </div>
+      </div>
+
+      <div class="shortcut-note">
+        <strong>During broadcast — keyboard shortcuts only:</strong><br>
+        <span class="kbd">F</span> Fullscreen &nbsp;·&nbsp;
+        <span class="kbd">E</span> Back to Edit &nbsp;·&nbsp;
+        <span class="kbd">Esc</span> Exit fullscreen
+      </div>
+
+      <button class="go-live-btn" onclick="goLive()">
+        <span class="pulse-dot"></span>
+        GO LIVE
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ══ BROADCAST VIEW ══ -->
+  <div id="broadcast">
+
+    <video id="bg-video" autoplay loop muted playsinline>
+      <source id="video-source" src="" type="video/mp4">
+    </video>
+
+    <div class="bg-overlay"></div>
+
+    <!-- LIVE badge -->
+    <div class="live-badge">
+      <span class="live-dot"></span>LIVE
+    </div>
+
+    <div class="ui-layer">
+      <!-- Top-right: location + clock -->
+      <div class="top-bar">
+        <div class="top-right">
+          <div class="top-location" id="display-location">HYDERABAD</div>
+          <div class="top-time" id="display-time">00:00:00</div>
+          <div class="top-date" id="display-date"></div>
+        </div>
+      </div>
+
+      <div class="flex-grow"></div>
+
+      <!-- Headline -->
+      <div class="headline-block">
+        <div class="breaking-label">
+          <span class="breaking-label-text">⚡ BREAKING NEWS</span>
+        </div>
+        <div class="headline-text" id="display-headline">Headline will appear here</div>
+        <div class="accent-line"></div>
+      </div>
+
+      <!-- Ticker -->
+      <div class="ticker-strip">
+        <div class="ticker-label">HIGHLIGHTS</div>
+        <div class="ticker-track">
+          <div class="ticker-inner" id="ticker-inner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logo: bottom-left, above ticker -->
+    <img class="broadcast-logo" src="./SumanTV_News_Logo__1_.png" alt="SumanTV" id="broadcast-logo">
+
+  </div>
+
+  <script>
+    /* ── Go Live ── */
+    function goLive() {
+      const videoPath = document.getElementById('video-path').value.trim();
+      const headline = document.getElementById('headline-input').value.trim() || 'Breaking News';
+      const tickerRaw = document.getElementById('ticker-input').value.trim();
+      const location = document.getElementById('location-input').value.trim() || 'Hyderabad';
+      const speed = parseInt(document.getElementById('speed-input').value);
+
+      document.getElementById('display-headline').textContent = headline;
+      document.getElementById('display-location').textContent = location.toUpperCase();
+
+      if (videoPath) {
+        const src = document.getElementById('video-source');
+        src.src = videoPath;
+        src.type = /\.webm$/i.test(videoPath) ? 'video/webm'
+          : /\.ogv$/i.test(videoPath) ? 'video/ogg'
+            : 'video/mp4';
+        const vid = document.getElementById('bg-video');
+        vid.load();
+        vid.play().catch(() => { });
+      }
+
+      const items = tickerRaw
+        ? tickerRaw.split('|').map(s => s.trim()).filter(Boolean)
+        : ['Add your highlights in the config panel', 'Separate each item with a pipe character'];
+
+      const ticker = document.getElementById('ticker-inner');
+      const doubled = [...items, ...items];
+      ticker.innerHTML = doubled.map(item =>
+        `<span class="ticker-item">${item}</span><span class="ticker-sep"></span>`
+      ).join('');
+
+      const totalChars = items.join(' ').length;
+      const dur = Math.max(12, totalChars * (1.6 - speed / 75));
+      ticker.style.animationDuration = dur + 's';
+
+      document.getElementById('config-panel').style.display = 'none';
+      document.getElementById('broadcast').style.display = 'block';
+
+      startClock();
+    }
+
+    /* ── Back to edit ── */
+    function goBack() {
+      document.getElementById('config-panel').style.display = 'flex';
+      document.getElementById('broadcast').style.display = 'none';
+      if (clockInterval) clearInterval(clockInterval);
+      if (document.fullscreenElement) document.exitFullscreen();
+    }
+
+    /* ── Clock ── */
+    let clockInterval;
+    function startClock() {
+      if (clockInterval) clearInterval(clockInterval);
+      function tick() {
+        const now = new Date();
+        document.getElementById('display-time').textContent =
+          now.toLocaleTimeString('en-IN', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('display-date').textContent =
+          now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+      }
+      tick();
+      clockInterval = setInterval(tick, 1000);
+    }
+
+    /* ── Keyboard shortcuts ── */
+    document.addEventListener('keydown', e => {
+      const inBroadcast = document.getElementById('broadcast').style.display === 'block';
+      if (!inBroadcast) return;
+
+      if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => { });
+        } else {
+          document.exitFullscreen();
+        }
+      }
+
+      if (e.key === 'e' || e.key === 'E') {
+        goBack();
+      }
+    });
+  </script>
+</body>
+
+</html>
